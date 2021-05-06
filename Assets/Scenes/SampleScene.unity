@@ -178,26 +178,42 @@ CompositeCollider2D:
   m_ColliderPaths:
   - m_Collider: {fileID: 13205688}
     m_ColliderPaths:
-    - - X: -104690464
-        Y: -6690476
-      - X: -111690464
-        Y: -6690476
-      - X: -111690464
-        Y: 309523
-      - X: -119309520
-        Y: 309523
-      - X: -119309520
-        Y: -35309524
-      - X: -112309520
-        Y: -35309524
-      - X: -112309520
-        Y: -49309524
-      - X: 112309536
-        Y: -49309524
-      - X: 112309536
+    - - X: 112309536
         Y: -41690480
       - X: -104690464
         Y: -41690480
+      - X: -104690464
+        Y: -6690476
+      - X: -111690464
+        Y: -6690476
+      - X: -111690464
+        Y: 309523
+      - X: -119309520
+        Y: 309523
+      - X: -119309520
+        Y: -35309524
+      - X: -112309520
+        Y: -35309524
+      - X: -112309520
+        Y: -49309524
+      - X: 112309536
+        Y: -49309524
+    - - X: -48690376
+        Y: -21309565
+      - X: -48690376
+        Y: -13690435
+      - X: -48690435
+        Y: -13690376
+      - X: -84309561
+        Y: -13690376
+      - X: -84309620
+        Y: -13690435
+      - X: -84309620
+        Y: -21309565
+      - X: -84309561
+        Y: -21309624
+      - X: -48690435
+        Y: -21309624
   m_CompositePaths:
     m_Paths:
     - - {x: 11.230925, y: -4.9309525}
@@ -210,6 +226,10 @@ CompositeCollider2D:
       - {x: -11.9309225, y: -3.5309525}
       - {x: -11.230952, y: -3.5309815}
       - {x: -11.230923, y: -4.9309525}
+    - - {x: -4.869073, y: -2.1309624}
+      - {x: -4.869073, y: -1.3690376}
+      - {x: -8.430962, y: -1.3690728}
+      - {x: -8.430926, y: -2.1309624}
   m_VertexDistance: 0.0005
   m_OffsetDistance: 0.00005
 --- !u!50 &13205687
@@ -696,6 +716,56 @@ Tilemap:
       m_TileObjectToInstantiateIndex: 65535
       dummyAlignment: 0
       m_AllTileFlags: 1073741825
+  - first: {x: -12, y: -3, z: 0}
+    second:
+      serializedVersion: 2
+      m_TileIndex: 3
+      m_TileSpriteIndex: 3
+      m_TileMatrixIndex: 0
+      m_TileColorIndex: 0
+      m_TileObjectToInstantiateIndex: 65535
+      dummyAlignment: 0
+      m_AllTileFlags: 1073741825
+  - first: {x: -11, y: -3, z: 0}
+    second:
+      serializedVersion: 2
+      m_TileIndex: 3
+      m_TileSpriteIndex: 3
+      m_TileMatrixIndex: 0
+      m_TileColorIndex: 0
+      m_TileObjectToInstantiateIndex: 65535
+      dummyAlignment: 0
+      m_AllTileFlags: 1073741825
+  - first: {x: -10, y: -3, z: 0}
+    second:
+      serializedVersion: 2
+      m_TileIndex: 3
+      m_TileSpriteIndex: 3
+      m_TileMatrixIndex: 0
+      m_TileColorIndex: 0
+      m_TileObjectToInstantiateIndex: 65535
+      dummyAlignment: 0
+      m_AllTileFlags: 1073741825
+  - first: {x: -9, y: -3, z: 0}
+    second:
+      serializedVersion: 2
+      m_TileIndex: 3
+      m_TileSpriteIndex: 3
+      m_TileMatrixIndex: 0
+      m_TileColorIndex: 0
+      m_TileObjectToInstantiateIndex: 65535
+      dummyAlignment: 0
+      m_AllTileFlags: 1073741825
+  - first: {x: -8, y: -3, z: 0}
+    second:
+      serializedVersion: 2
+      m_TileIndex: 3
+      m_TileSpriteIndex: 3
+      m_TileMatrixIndex: 0
+      m_TileColorIndex: 0
+      m_TileObjectToInstantiateIndex: 65535
+      dummyAlignment: 0
+      m_AllTileFlags: 1073741825
   - first: {x: -17, y: -2, z: 0}
     second:
       serializedVersion: 2
@@ -734,6 +804,8 @@ Tilemap:
     m_Data: {fileID: 11400000, guid: 5fa18dfd2a3f2544fb49fae947f76a94, type: 2}
   - m_RefCount: 10
     m_Data: {fileID: 11400000, guid: e7be4b7dbd77d744eb751ab73a7dac39, type: 2}
+  - m_RefCount: 5
+    m_Data: {fileID: 11400000, guid: 641393e7f1601bd45a6a9d2291b07682, type: 2}
   m_TileSpriteArray:
   - m_RefCount: 23
     m_Data: {fileID: -540830833759023508, guid: 6cad9b2585e070b4da9be2fc0f0cf7d9, type: 3}
@@ -741,8 +813,10 @@ Tilemap:
     m_Data: {fileID: 6084133513982503219, guid: 6cad9b2585e070b4da9be2fc0f0cf7d9, type: 3}
   - m_RefCount: 10
     m_Data: {fileID: -7339757114842912050, guid: 6cad9b2585e070b4da9be2fc0f0cf7d9, type: 3}
+  - m_RefCount: 5
+    m_Data: {fileID: 6142968344651211451, guid: 6cad9b2585e070b4da9be2fc0f0cf7d9, type: 3}
   m_TileMatrixArray:
-  - m_RefCount: 42
+  - m_RefCount: 47
     m_Data:
       e00: 1
       e01: 0
@@ -761,7 +835,7 @@ Tilemap:
       e32: 0
       e33: 1
   m_TileColorArray:
-  - m_RefCount: 42
+  - m_RefCount: 47
     m_Data: {r: 1, g: 1, b: 1, a: 1}
   m_TileObjectToInstantiateArray: []
   m_AnimationFrameRate: 1
@@ -1154,10 +1228,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6a160d838ff8b4b4693ac20007e008c7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_AssetsPPU: 21
-  m_RefResolutionX: 326
+  m_AssetsPPU: 16
+  m_RefResolutionX: 320
   m_RefResolutionY: 180
-  m_UpscaleRT: 1
+  m_UpscaleRT: 0
   m_PixelSnapping: 0
   m_CropFrameX: 0
   m_CropFrameY: 0
@@ -1234,6 +1308,7 @@ GameObject:
   - component: {fileID: 996746346}
   - component: {fileID: 996746347}
   - component: {fileID: 996746345}
+  - component: {fileID: 996746348}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -1272,7 +1347,7 @@ Rigidbody2D:
   m_Mass: 1
   m_LinearDrag: 0
   m_AngularDrag: 0.05
-  m_GravityScale: 0
+  m_GravityScale: 3
   m_Material: {fileID: 0}
   m_Interpolate: 1
   m_SleepingMode: 1
@@ -1350,7 +1425,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 996746340}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f600d55e77462aa4492b614ff71d8699, type: 3}
   m_Name: 
@@ -1374,7 +1449,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 996746340}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 27e2eedc649b6e54897f40f68c45b1d9, type: 3}
   m_Name: 
@@ -1402,13 +1477,27 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 996746340}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: dd86b9b09f99a93459850888e63170a4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   fallMultiplier: 3
   lowJumpMultiplier: 8
+--- !u!114 &996746348
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 996746340}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2be7aa24bfd0347838b9b7cbe046ecbc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  WalkSpeed: 5
+  JumpForce: 10
 --- !u!1 &1863689101
 GameObject:
   m_ObjectHideFlags: 0

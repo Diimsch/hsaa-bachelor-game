@@ -28,8 +28,9 @@ public class Player : MonoBehaviour
     public float groundTouchedValidTil = 0.25f;
 
     [Header("Components")]
-    private SpriteRenderer spriteRenderer;
-    private Animator animator;
+    public GameObject spriteHolder;
+    public SpriteRenderer spriteRenderer;
+    public Animator animator;
     private Rigidbody2D rb;
     public LayerMask groundLayer;
 
@@ -50,13 +51,12 @@ public class Player : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
-        spriteRenderer = GetComponent<SpriteRenderer>();
-        animator = GetComponent<Animator>();
     }
 
     // Update is called once per frame
     void Update()
     {
+        bool wasGrounded = isGrounded;
         isGrounded = Physics2D.Raycast(transform.position, Vector2.down, lengthToGround, groundLayer);
         isOnLeftWall = Physics2D.Raycast(transform.position, Vector2.left, lengthToWall, groundLayer);
         isOnRightWall = Physics2D.Raycast(transform.position, Vector2.right, lengthToWall, groundLayer);
@@ -64,6 +64,11 @@ public class Player : MonoBehaviour
         dir = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
 
         grabbing = Input.GetButton("Grab");
+
+        if(!wasGrounded && isGrounded)
+        {
+            StartCoroutine(SqueezeSprites(new Vector2(1.25f, 0.8f), 0.05f));
+        }
 
         if(Input.GetButtonDown("Jump"))
         {
@@ -143,6 +148,8 @@ public class Player : MonoBehaviour
         animator.SetTrigger("isJumping");
         rb.velocity = new Vector2(rb.velocity.x, 0);
         rb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
+        lastJumped = 0;
+        StartCoroutine(SqueezeSprites(new Vector2(0.8f, 1.25f), 0.05f));
     }
 
     private void UpdateDirection(Vector2 input)
@@ -179,5 +186,27 @@ public class Player : MonoBehaviour
         Gizmos.DrawLine(transform.position, transform.position + Vector3.down * lengthToGround);
         Gizmos.DrawLine(transform.position, transform.position + Vector3.left * lengthToWall);
         Gizmos.DrawLine(transform.position, transform.position + Vector3.right * lengthToWall);
+    }
+
+    IEnumerator SqueezeSprites(Vector2 squeeze, float animTime)
+    {
+        Vector3 squeezedScale = squeeze;
+        squeezedScale.z = 1.0f;
+
+        float timePassed = 0;
+
+        while(timePassed <= 1.0f)
+        {
+            timePassed += Time.deltaTime / animTime;
+            spriteHolder.transform.localScale = Vector3.Lerp(Vector3.one, squeezedScale, timePassed);
+            yield return null;
+        }
+        timePassed = 0;
+        while(timePassed <= 1.0f)
+        {
+            timePassed += Time.deltaTime / animTime;
+            spriteHolder.transform.localScale = Vector3.Lerp(squeezedScale, Vector3.one, timePassed);
+            yield return null;
+        }
     }
 }

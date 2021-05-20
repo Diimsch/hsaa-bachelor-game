@@ -167,7 +167,7 @@ CompositeCollider2D:
   m_GameObject: {fileID: 13205684}
   m_Enabled: 1
   m_Density: 1
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 6200000, guid: 6461be0b42c674bc083230eb8732568d, type: 2}
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
@@ -4200,9 +4200,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1292256914}
-  - component: {fileID: 1292256915}
   - component: {fileID: 1292256916}
   - component: {fileID: 1292256917}
+  - component: {fileID: 1292256915}
   m_Layer: 0
   m_Name: Student
   m_TagString: Player
@@ -4258,7 +4258,9 @@ MonoBehaviour:
   isOnWall: 0
   isOnLeftWall: 0
   isOnRightWall: 0
-  lengthToGround: 1
+  raycastOffsetLeft: {x: 0.5, y: 0, z: 0}
+  raycastOffsetRight: {x: 0.437, y: 0, z: 0}
+  lengthToGround: 1.01
   lengthToWall: 0.6
 --- !u!50 &1292256916
 Rigidbody2D:
@@ -4273,13 +4275,13 @@ Rigidbody2D:
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
   m_Mass: 1
-  m_LinearDrag: 0
+  m_LinearDrag: 4
   m_AngularDrag: 0.05
   m_GravityScale: 0.5
   m_Material: {fileID: 0}
   m_Interpolate: 0
   m_SleepingMode: 1
-  m_CollisionDetection: 0
+  m_CollisionDetection: 1
   m_Constraints: 4
 --- !u!61 &1292256917
 BoxCollider2D:
@@ -4294,7 +4296,7 @@ BoxCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: -0.015500069, y: -0.117771864}
+  m_Offset: {x: -0.015500069, y: -0.1300531}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
@@ -4305,7 +4307,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 0.4708519, y: 0.7096977}
+  m_Size: {x: 0.4708519, y: 0.7342602}
   m_EdgeRadius: 0
 --- !u!1 &1863689101
 GameObject:

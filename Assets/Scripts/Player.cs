@@ -44,6 +44,8 @@ public class Player : MonoBehaviour
     [SerializeField]
     private bool isOnRightWall = false;
 
+    public Vector3 raycastOffsetLeft;
+    public Vector3 raycastOffsetRight;
     public float lengthToGround = 0.83f;
     public float lengthToWall = 0.4f;
 
@@ -57,7 +59,7 @@ public class Player : MonoBehaviour
     void Update()
     {
         bool wasGrounded = isGrounded;
-        isGrounded = Physics2D.Raycast(transform.position, Vector2.down, lengthToGround, groundLayer);
+        isGrounded = Physics2D.Raycast(transform.position - raycastOffsetLeft, Vector2.down, lengthToGround, groundLayer) || Physics2D.Raycast(transform.position + raycastOffsetRight, Vector2.down, lengthToGround, groundLayer); ;
         isOnLeftWall = Physics2D.Raycast(transform.position, Vector2.left, lengthToWall, groundLayer);
         isOnRightWall = Physics2D.Raycast(transform.position, Vector2.right, lengthToWall, groundLayer);
         isOnWall = isOnLeftWall || isOnRightWall;
@@ -110,7 +112,8 @@ public class Player : MonoBehaviour
         if (isGrounded)
         {
             bool changingDirection = (input.x < 0 && rb.velocity.x > 0) || (input.x > 0 && rb.velocity.x < 0);
-            rb.drag = Mathf.Abs(input.x) < 0.4f || changingDirection ? drag : 0;
+            rb.drag = Mathf.Abs(input.x) == 0 || changingDirection ? drag : 0;
+            Debug.Log(input.x);
 
             rb.gravityScale = 0;
         }
@@ -136,7 +139,8 @@ public class Player : MonoBehaviour
             rb.velocity = new Vector2(0, input.y * climbSpeed);
             return;
         }
-        rb.AddForce(Vector2.right * input.x * runSpeed);
+        rb.velocity += Vector2.right * input.x * runSpeed * Time.deltaTime;
+        //rb.AddForce(Vector2.right * input.x * runSpeed);
         if(Mathf.Abs(rb.velocity.x) > maxSpeed)
         {
             rb.velocity = new Vector2(Mathf.Sign(rb.velocity.x) * maxSpeed, rb.velocity.y);
@@ -183,7 +187,8 @@ public class Player : MonoBehaviour
     private void OnDrawGizmos()
     {
         Gizmos.color = Color.red;
-        Gizmos.DrawLine(transform.position, transform.position + Vector3.down * lengthToGround);
+        Gizmos.DrawLine(transform.position + raycastOffsetRight, transform.position + raycastOffsetRight + Vector3.down * lengthToGround);
+        Gizmos.DrawLine(transform.position - raycastOffsetLeft, transform.position - raycastOffsetLeft + Vector3.down * lengthToGround);
         Gizmos.DrawLine(transform.position, transform.position + Vector3.left * lengthToWall);
         Gizmos.DrawLine(transform.position, transform.position + Vector3.right * lengthToWall);
     }

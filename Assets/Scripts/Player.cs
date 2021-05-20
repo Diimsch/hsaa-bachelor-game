@@ -49,6 +49,9 @@ public class Player : MonoBehaviour
     public float lengthToGround = 0.83f;
     public float lengthToWall = 0.4f;
 
+    [Header("Particles")]
+    public ParticleSystem dust;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -153,6 +156,8 @@ public class Player : MonoBehaviour
         rb.velocity = new Vector2(rb.velocity.x, 0);
         rb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
         lastJumped = 0;
+
+        dust.Play();
         StartCoroutine(SqueezeSprites(new Vector2(0.8f, 1.25f), 0.05f));
     }
 
@@ -173,7 +178,14 @@ public class Player : MonoBehaviour
         {
             return;
         }
+
+        bool oldDirection = spriteRenderer.flipX;
         spriteRenderer.flipX = input.x < 0.0f;
+
+        if (oldDirection != spriteRenderer.flipX)
+        {
+            dust.Play();
+        }
     }
 
     private void UpdateAnimator(Vector2 input)

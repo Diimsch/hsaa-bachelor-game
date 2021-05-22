@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class Player : MonoBehaviour
 {
@@ -20,6 +21,7 @@ public class Player : MonoBehaviour
     public float fallMultiplier = 2.5f;
 
     // buffered jumping
+    private bool jumping = false;
     public float jumpDelay = 0.25f;
     private float lastJumped;
 
@@ -66,18 +68,10 @@ public class Player : MonoBehaviour
         isOnLeftWall = Physics2D.Raycast(transform.position, Vector2.left, lengthToWall, groundLayer);
         isOnRightWall = Physics2D.Raycast(transform.position, Vector2.right, lengthToWall, groundLayer);
         isOnWall = isOnLeftWall || isOnRightWall;
-        dir = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
-
-        grabbing = Input.GetButton("Grab");
 
         if(!wasGrounded && isGrounded)
         {
             StartCoroutine(SqueezeSprites(new Vector2(1.25f, 0.8f), 0.05f));
-        }
-
-        if(Input.GetButtonDown("Jump"))
-        {
-            lastJumped = Time.time + jumpDelay;
         }
 
         if(isGrounded)
@@ -116,7 +110,6 @@ public class Player : MonoBehaviour
         {
             bool changingDirection = (input.x < 0 && rb.velocity.x > 0) || (input.x > 0 && rb.velocity.x < 0);
             rb.drag = Mathf.Abs(input.x) == 0 || changingDirection ? drag : 0;
-            Debug.Log(input.x);
 
             rb.gravityScale = 0;
         }
@@ -128,7 +121,7 @@ public class Player : MonoBehaviour
             {
                 rb.gravityScale *= fallMultiplier;
             }
-            else if (rb.velocity.y > 0 && !Input.GetButton("Jump"))
+            else if (rb.velocity.y > 0 && !jumping)
             {
                 rb.gravityScale *= fallMultiplier / 2;
             }
@@ -142,7 +135,7 @@ public class Player : MonoBehaviour
             rb.velocity = new Vector2(0, input.y * climbSpeed);
             return;
         }
-        rb.velocity += Vector2.right * input.x * runSpeed * Time.deltaTime;
+        rb.velocity += Vector2.right * (input.x * runSpeed * Time.deltaTime);
         //rb.AddForce(Vector2.right * input.x * runSpeed);
         if(Mathf.Abs(rb.velocity.x) > maxSpeed)
         {
@@ -224,6 +217,41 @@ public class Player : MonoBehaviour
             timePassed += Time.deltaTime / animTime;
             spriteHolder.transform.localScale = Vector3.Lerp(squeezedScale, Vector3.one, timePassed);
             yield return null;
+        }
+    }
+    
+    public void OnMove(InputAction.CallbackContext ctx)
+    {
+        dir = ctx.ReadValue<Vector2>();
+    }
+
+    public void OnJump(InputAction.CallbackContext ctx)
+    {
+        switch (ctx.phase)
+        {
+            case InputActionPhase.Started:
+                lastJumped = Time.time + jumpDelay;
+                break;
+            case InputActionPhase.Performed:
+                jumping = true;
+                break;
+            default:
+                jumping = false;
+                break;
+        }
+    }
+
+    public void OnGrab(InputAction.CallbackContext ctx)
+    {
+        switch (ctx.phase)
+        {
+            case InputActionPhase.Started:
+            case InputActionPhase.Performed:
+                grabbing = true;
+                break;
+            default:
+                grabbing = false;
+                break;
         }
     }
 }

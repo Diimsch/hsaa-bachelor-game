@@ -34,6 +34,7 @@ public class Player : MonoBehaviour
     public SpriteRenderer spriteRenderer;
     public Animator animator;
     private Rigidbody2D rb;
+    private BoxCollider2D bc;
     public LayerMask groundLayer;
 
     [Header("Collision")]
@@ -46,10 +47,18 @@ public class Player : MonoBehaviour
     [SerializeField]
     private bool isOnRightWall = false;
 
+    [SerializeField] private bool isBangingHeadLeft = false;
+    [SerializeField] private bool isBangingHeadRight = false;
+    [SerializeField] private bool isBangingHeadBoth = false;
+
     public Vector3 raycastOffsetLeft;
     public Vector3 raycastOffsetRight;
     public float lengthToGround = 0.83f;
     public float lengthToWall = 0.4f;
+    public Vector3 cornerCorrectionOffsetLeft;
+    public Vector3 cornerCorrectionOffsetRight;
+    public Vector3 cornerCorrectionInnerOffset;
+    public float cornerCorrectionLength = 0.25f;
 
     [Header("Particles")]
     public ParticleSystem dust;
@@ -58,6 +67,7 @@ public class Player : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
+        bc = GetComponent<BoxCollider2D>();
     }
 
     // Update is called once per frame
@@ -68,6 +78,11 @@ public class Player : MonoBehaviour
         isOnLeftWall = Physics2D.Raycast(transform.position, Vector2.left, lengthToWall, groundLayer);
         isOnRightWall = Physics2D.Raycast(transform.position, Vector2.right, lengthToWall, groundLayer);
         isOnWall = isOnLeftWall || isOnRightWall;
+        
+        isBangingHeadLeft = Physics2D.Raycast(transform.position - cornerCorrectionOffsetLeft, Vector2.up, cornerCorrectionLength, groundLayer) && !Physics2D.Raycast(transform.position - cornerCorrectionOffsetLeft + cornerCorrectionInnerOffset, Vector2.up, cornerCorrectionLength, groundLayer);;
+        isBangingHeadRight = Physics2D.Raycast(transform.position + cornerCorrectionOffsetRight, Vector2.up, cornerCorrectionLength, groundLayer) && !Physics2D.Raycast(transform.position + cornerCorrectionOffsetRight - cornerCorrectionInnerOffset, Vector2.up, cornerCorrectionLength, groundLayer);;
+        isBangingHeadBoth = isBangingHeadLeft && isBangingHeadRight;
+
 
         if(!wasGrounded && isGrounded)
         {
@@ -100,6 +115,24 @@ public class Player : MonoBehaviour
 
     private void UpdatePhysics(Vector2 input)
     {
+        if ((isBangingHeadLeft || isBangingHeadRight) && !isBangingHeadBoth)
+        {
+            bc.enabled = false;
+
+            Vector2 correctionVelocity = isBangingHeadLeft ? Vector2.right : Vector2.left;
+            correctionVelocity.y = rb.velocity.y;
+
+            rb.velocity = correctionVelocity;
+        }
+        else
+        {
+            if (!bc.enabled)
+            {
+                bc.enabled = true;
+                rb.velocity = new Vector2(0, rb.velocity.y);
+            }
+        }
+
         if(grabbing && isOnWall)
         {
             rb.gravityScale = 0;
@@ -136,7 +169,6 @@ public class Player : MonoBehaviour
             return;
         }
         rb.velocity += Vector2.right * (input.x * runSpeed * Time.deltaTime);
-        //rb.AddForce(Vector2.right * input.x * runSpeed);
         if(Mathf.Abs(rb.velocity.x) > maxSpeed)
         {
             rb.velocity = new Vector2(Mathf.Sign(rb.velocity.x) * maxSpeed, rb.velocity.y);
@@ -196,6 +228,12 @@ public class Player : MonoBehaviour
         Gizmos.DrawLine(transform.position - raycastOffsetLeft, transform.position - raycastOffsetLeft + Vector3.down * lengthToGround);
         Gizmos.DrawLine(transform.position, transform.position + Vector3.left * lengthToWall);
         Gizmos.DrawLine(transform.position, transform.position + Vector3.right * lengthToWall);
+        
+        Gizmos.DrawLine(transform.position + cornerCorrectionOffsetRight - cornerCorrectionInnerOffset, transform.position + cornerCorrectionOffsetRight - cornerCorrectionInnerOffset + Vector3.up * cornerCorrectionLength);
+        Gizmos.DrawLine(transform.position - cornerCorrectionOffsetLeft + cornerCorrectionInnerOffset, transform.position - cornerCorrectionOffsetLeft + cornerCorrectionInnerOffset + Vector3.up * cornerCorrectionLength);
+
+        Gizmos.DrawLine(transform.position + cornerCorrectionOffsetRight, transform.position + cornerCorrectionOffsetRight + Vector3.up * cornerCorrectionLength);
+        Gizmos.DrawLine(transform.position - cornerCorrectionOffsetLeft, transform.position - cornerCorrectionOffsetLeft + Vector3.up * cornerCorrectionLength);
     }
 
     IEnumerator SqueezeSprites(Vector2 squeeze, float animTime)

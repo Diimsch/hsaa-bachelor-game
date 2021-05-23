@@ -4780,10 +4780,16 @@ MonoBehaviour:
   isOnWall: 0
   isOnLeftWall: 0
   isOnRightWall: 0
+  isBangingHeadLeft: 0
+  isBangingHeadRight: 0
+  isBangingHeadBoth: 0
   raycastOffsetLeft: {x: 0.5, y: 0, z: 0}
   raycastOffsetRight: {x: 0.437, y: 0, z: 0}
   lengthToGround: 1.01
   lengthToWall: 0.6
+  cornerCorrectionOffsetLeft: {x: 0.62, y: 0, z: 0}
+  cornerCorrectionOffsetRight: {x: 0.56, y: 0, z: 0}
+  cornerCorrectionLength: 0.51
   dust: {fileID: 1450553565}
 --- !u!50 &1292256916
 Rigidbody2D:

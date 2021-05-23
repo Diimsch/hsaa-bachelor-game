@@ -74,7 +74,7 @@ public class Player : MonoBehaviour
             StartCoroutine(SqueezeSprites(new Vector2(1.25f, 0.8f), 0.05f));
         }
 
-        if(isGrounded)
+        if(isGrounded || grabbing)
         {
             lastValidGroundTouch = Time.time + groundTouchedValidTil;
         }
@@ -247,6 +247,10 @@ public class Player : MonoBehaviour
         {
             case InputActionPhase.Started:
             case InputActionPhase.Performed:
+                if (!isOnWall)
+                {
+                    return;
+                }
                 grabbing = true;
                 break;
             default:

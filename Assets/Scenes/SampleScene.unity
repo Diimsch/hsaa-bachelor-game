@@ -4021,7 +4021,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 441638292}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -13.87, y: -3.73, z: -10}
+  m_LocalPosition: {x: -13.23, y: 2.64, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1243323467}
@@ -4739,7 +4739,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1292256911}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -13.87, y: -3.73, z: 0}
+  m_LocalPosition: {x: -13.23, y: 2.61, z: 0}
   m_LocalScale: {x: 2, y: 2, z: 2}
   m_Children:
   - {fileID: 1896854404}
@@ -4787,9 +4787,10 @@ MonoBehaviour:
   raycastOffsetRight: {x: 0.437, y: 0, z: 0}
   lengthToGround: 1.01
   lengthToWall: 0.6
-  cornerCorrectionOffsetLeft: {x: 0.62, y: 0, z: 0}
-  cornerCorrectionOffsetRight: {x: 0.56, y: 0, z: 0}
-  cornerCorrectionLength: 0.51
+  cornerCorrectionOffsetLeft: {x: 0.51, y: 0, z: 0}
+  cornerCorrectionOffsetRight: {x: 0.45, y: 0, z: 0}
+  cornerCorrectionInnerOffset: {x: 0.25, y: 0, z: 0}
+  cornerCorrectionLength: 0.6
   dust: {fileID: 1450553565}
 --- !u!50 &1292256916
 Rigidbody2D:

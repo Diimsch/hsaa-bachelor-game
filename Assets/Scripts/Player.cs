@@ -20,6 +20,13 @@ public class Player : MonoBehaviour
     public float jumpingGravity = 1.0f;
     public float fallMultiplier = 2.5f;
 
+    // dash
+    public float dashSpeed = 20;
+    private float dashTime;
+    public float startDashTime = 0.1f;
+    public bool hasDashed = false;
+
+
     // buffered jumping
     private bool jumping = false;
     public float jumpDelay = 0.25f;
@@ -145,6 +152,7 @@ public class Player : MonoBehaviour
             rb.drag = Mathf.Abs(input.x) == 0 || changingDirection ? drag : 0;
 
             rb.gravityScale = 0;
+            hasDashed = false;
         }
         else
         {
@@ -296,4 +304,29 @@ public class Player : MonoBehaviour
                 break;
         }
     }
+
+    public void OnDash(InputAction.CallbackContext ctx)
+    {
+        switch (ctx.phase)
+        {
+            case InputActionPhase.Started:
+            case InputActionPhase.Performed:
+                Dash();
+                break;
+            default:
+                break;
+        }
+    }
+
+    public void Dash()
+    {
+        if (!hasDashed)
+        {
+            rb.velocity = Vector2.zero;
+            dust.Play();
+            rb.velocity += dir.normalized * dashSpeed;
+            hasDashed = true;
+        }
+    }
+
 }

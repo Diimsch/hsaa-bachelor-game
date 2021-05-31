@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -318,13 +319,33 @@ public class Player : MonoBehaviour
         }
     }
 
-    public void Dash()
+    private void Dash()
     {
         if (!hasDashed)
         {
-            rb.velocity = Vector2.zero;
+            if (rb.velocity.y < 0)
+            {
+                rb.velocity = new Vector2(rb.velocity.x, 0);
+            }
+
             dust.Play();
-            rb.velocity += dir.normalized * dashSpeed;
+            if (dir.Equals(Vector2.zero))
+            {
+                Vector2 facingDir = spriteRenderer.flipX ? Vector2.left : Vector2.right;
+                if (Mathf.Sign(facingDir.x) != Mathf.Sign(rb.velocity.x))
+                {
+                    rb.velocity = Vector2.zero;
+                }
+                rb.velocity += facingDir * dashSpeed;
+            }
+            else
+            {
+                if (Mathf.Sign(dir.x) != Mathf.Sign(rb.velocity.x))
+                {
+                    rb.velocity = Vector2.zero;
+                }
+                rb.velocity += dir.normalized * dashSpeed;
+            }
             hasDashed = true;
         }
     }

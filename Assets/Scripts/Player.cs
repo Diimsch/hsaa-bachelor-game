@@ -156,7 +156,7 @@ public class Player : MonoBehaviour
         if (isGrounded)
         {
             bool changingDirection = (input.x < 0 && rb.velocity.x > 0) || (input.x > 0 && rb.velocity.x < 0);
-            rb.drag = Mathf.Abs(input.x) == 0 || changingDirection ? drag : 0;
+            // rb.drag = Mathf.Abs(input.x) == 0 || changingDirection ? drag : 0;
 
             rb.gravityScale = 0;
             hasDashed = false;
@@ -164,7 +164,7 @@ public class Player : MonoBehaviour
         else
         {
             rb.gravityScale = jumpingGravity;
-            rb.drag = drag * 0.15f;
+            // rb.drag = drag * 0.15f;
             if (rb.velocity.y < 0)
             {
                 rb.gravityScale *= fallMultiplier;

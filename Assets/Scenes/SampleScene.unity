@@ -4804,14 +4804,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   dir: {x: 0, y: 0}
   grabbing: 0
-  runSpeed: 10
+  runSpeed: 45
   maxSpeed: 7
-  jumpForce: 13
+  jumpForce: 20
   climbSpeed: 3
   drag: 4
   jumpingGravity: 2
-  fallMultiplier: 2.5
-  dashSpeed: 20
+  fallMultiplier: 3
+  dashSpeed: 25
   startDashTime: 0.1
   hasDashed: 0
   jumpDelay: 0.25

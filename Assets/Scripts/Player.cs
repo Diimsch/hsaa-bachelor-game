@@ -22,10 +22,11 @@ public class Player : MonoBehaviour
     public float fallMultiplier = 2.5f;
 
     // dash
-    public float dashSpeed = 20;
+    public float dashSpeed = 10;
     private float dashTime;
     public float startDashTime = 0.1f;
     public bool hasDashed = false;
+    private bool dashing = false;
 
 
     // buffered jumping
@@ -141,6 +142,11 @@ public class Player : MonoBehaviour
             }
         }
 
+        if (dashing)
+        {
+            return;
+        }
+
         if(grabbing && isOnWall)
         {
             rb.gravityScale = 0;
@@ -178,7 +184,7 @@ public class Player : MonoBehaviour
             return;
         }
         rb.velocity += Vector2.right * (input.x * runSpeed * Time.deltaTime);
-        if(Mathf.Abs(rb.velocity.x) > maxSpeed)
+        if(Mathf.Abs(rb.velocity.x) > maxSpeed && !dashing)
         {
             rb.velocity = new Vector2(Mathf.Sign(rb.velocity.x) * maxSpeed, rb.velocity.y);
         }
@@ -312,42 +318,45 @@ public class Player : MonoBehaviour
         {
             case InputActionPhase.Started:
             case InputActionPhase.Performed:
-                Dash();
+                StartCoroutine(Dash());
                 break;
             default:
                 break;
         }
     }
 
-    private void Dash()
+    private IEnumerator Dash()
     {
         if (!hasDashed)
         {
-            if (rb.velocity.y < 0)
-            {
-                rb.velocity = new Vector2(rb.velocity.x, 0);
-            }
-
+            rb.velocity = Vector2.zero;
             dust.Play();
+
+            Vector2 dashingDirection;
+            float previousVelocityX = rb.velocity.x;
+            
             if (dir.Equals(Vector2.zero))
             {
-                Vector2 facingDir = spriteRenderer.flipX ? Vector2.left : Vector2.right;
-                if (Mathf.Sign(facingDir.x) != Mathf.Sign(rb.velocity.x))
-                {
-                    rb.velocity = Vector2.zero;
-                }
-                rb.velocity += facingDir * dashSpeed;
+                Debug.Log(dir);
+                dashingDirection = spriteRenderer.flipX ? Vector2.left : Vector2.right;
+                rb.velocity += dashingDirection * dashSpeed;
             }
             else
             {
-                if (Mathf.Sign(dir.x) != Mathf.Sign(rb.velocity.x))
-                {
-                    rb.velocity = Vector2.zero;
-                }
+                dashingDirection = dir;
                 rb.velocity += dir.normalized * dashSpeed;
             }
+
             hasDashed = true;
+            dashing = true;
+            float gravityScale = rb.gravityScale;
+            rb.gravityScale = 0;
+            yield return new WaitForSeconds(0.05f);
+            rb.gravityScale = gravityScale;
+            dashing = false;
         }
     }
+    
+    
 
 }

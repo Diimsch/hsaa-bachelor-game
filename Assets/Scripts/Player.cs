@@ -10,7 +10,8 @@ public class Player : MonoBehaviour
     [SerializeField]
     private Vector2 dir;
     [SerializeField]
-    private bool grabbing = false;
+    private IEnumerator grabbing = null;
+    private int stamina = 100;
 
     [Header("Movement")]
     public float runSpeed = 10.0f;
@@ -98,9 +99,10 @@ public class Player : MonoBehaviour
             StartCoroutine(SqueezeSprites(new Vector2(1.25f, 0.8f), 0.05f));
         }
 
-        if(isGrounded || grabbing)
+        if(isGrounded && grabbing == null)
         {
             lastValidGroundTouch = Time.time + groundTouchedValidTil;
+            stamina = 100;
         }
     }
 
@@ -147,7 +149,7 @@ public class Player : MonoBehaviour
             return;
         }
 
-        if(grabbing && isOnWall)
+        if(grabbing != null && isOnWall)
         {
             rb.gravityScale = 0;
             return;
@@ -178,7 +180,7 @@ public class Player : MonoBehaviour
 
     private void MoveCharacter(Vector2 input)
     {
-        if(grabbing && isOnWall)
+        if(grabbing != null && isOnWall)
         {
             rb.velocity = new Vector2(0, input.y * climbSpeed);
             return;
@@ -203,7 +205,7 @@ public class Player : MonoBehaviour
 
     private void UpdateDirection(Vector2 input)
     {
-        if(grabbing)
+        if(grabbing != null)
         {
             if(isOnLeftWall)
             {
@@ -232,8 +234,8 @@ public class Player : MonoBehaviour
     {
         animator.SetBool("isRunning", Mathf.Abs(rb.velocity.x) > 0.1f);
         animator.SetBool("isFalling", rb.velocity.y < -0.001f);
-        animator.SetBool("isGrabbing", grabbing && isOnWall);
-        animator.SetBool("isClimbing", grabbing && isOnWall && Mathf.Abs(rb.velocity.y) > 0.1f);
+        animator.SetBool("isGrabbing", grabbing != null && isOnWall);
+        animator.SetBool("isClimbing", grabbing != null && isOnWall && Mathf.Abs(rb.velocity.y) > 0.1f);
     }
 
     private void OnDrawGizmos()
@@ -299,17 +301,52 @@ public class Player : MonoBehaviour
         switch (ctx.phase)
         {
             case InputActionPhase.Started:
-            case InputActionPhase.Performed:
-                if (!isOnWall)
+                if (!isOnWall || stamina <= 0)
                 {
                     return;
                 }
-                grabbing = true;
+                Debug.Log("start climbing.");
+                grabbing = Grab();
+                StartCoroutine(grabbing);
+                break;
+            case InputActionPhase.Performed:
+                if (!isOnWall)
+                {
+                    if (grabbing != null)
+                    {
+                        StopCoroutine(grabbing);
+                        grabbing = null;
+                    }
+                }
+                else
+                {
+                    if (grabbing == null && stamina > 0)
+                    {
+                        grabbing = Grab();
+                        StartCoroutine(grabbing);
+                    }
+                }
                 break;
             default:
-                grabbing = false;
+                if (grabbing != null)
+                {
+                    StopCoroutine(grabbing);
+                    grabbing = null;
+                }
                 break;
         }
+    }
+
+    private IEnumerator Grab()
+    {
+        while (stamina > 0)
+        {
+            stamina -= 5;
+            Debug.Log(String.Format("stamina {0}", stamina));
+            yield return new WaitForSeconds(0.1f);
+        }
+        StopCoroutine(grabbing);
+        grabbing = null;
     }
 
     public void OnDash(InputAction.CallbackContext ctx)
@@ -333,11 +370,9 @@ public class Player : MonoBehaviour
             dust.Play();
 
             Vector2 dashingDirection;
-            float previousVelocityX = rb.velocity.x;
-            
+
             if (dir.Equals(Vector2.zero))
             {
-                Debug.Log(dir);
                 dashingDirection = spriteRenderer.flipX ? Vector2.left : Vector2.right;
                 rb.velocity += dashingDirection * dashSpeed;
             }

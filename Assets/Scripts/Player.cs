@@ -99,9 +99,13 @@ public class Player : MonoBehaviour
             StartCoroutine(SqueezeSprites(new Vector2(1.25f, 0.8f), 0.05f));
         }
 
-        if(isGrounded && grabbing == null)
+        if (isGrounded || isOnWall)
         {
             lastValidGroundTouch = Time.time + groundTouchedValidTil;
+        }
+        
+        if(isGrounded && grabbing == null)
+        {
             stamina = 100;
         }
     }
@@ -194,13 +198,27 @@ public class Player : MonoBehaviour
 
     private void Jump()
     {
+        Vector2 jumpDirection = Vector2.up;
+        // walljump
+
+        bool changeDirection = false;
+        if (isOnWall && !isGrounded)
+        {
+            jumpDirection += isOnLeftWall ? Vector2.right : Vector2.left;
+            changeDirection = true;
+        } 
         animator.SetTrigger("isJumping");
         rb.velocity = new Vector2(rb.velocity.x, 0);
-        rb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
+        rb.AddForce(jumpDirection * jumpForce, ForceMode2D.Impulse);
         lastJumped = 0;
 
         dust.Play();
         StartCoroutine(SqueezeSprites(new Vector2(0.8f, 1.25f), 0.05f));
+
+        if (changeDirection)
+        {
+            UpdateDirection(jumpDirection);
+        }
     }
 
     private void UpdateDirection(Vector2 input)

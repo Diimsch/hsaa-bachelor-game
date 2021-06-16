@@ -51,6 +51,10 @@ public class Player : MonoBehaviour
     [SerializeField]
     private bool isGrounded = false;
     [SerializeField]
+    private bool isGroundedLeft = false;
+    [SerializeField]
+    private bool isGroundedRight = false;
+    [SerializeField]
     private bool isOnWall = false;
     [SerializeField]
     private bool isOnLeftWall = false;
@@ -69,6 +73,11 @@ public class Player : MonoBehaviour
     public Vector3 cornerCorrectionOffsetRight;
     public Vector3 cornerCorrectionInnerOffset;
     public float cornerCorrectionLength = 0.25f;
+    
+    // climb ledge
+    public Vector3 climbLedgeOffset;
+    public bool feetTouchingWall = false;
+    private IEnumerator climbingLedge = null;
 
     [Header("Particles")]
     public ParticleSystem dust;
@@ -84,7 +93,10 @@ public class Player : MonoBehaviour
     void Update()
     {
         bool wasGrounded = isGrounded;
-        isGrounded = Physics2D.Raycast(transform.position - raycastOffsetLeft, Vector2.down, lengthToGround, groundLayer) || Physics2D.Raycast(transform.position + raycastOffsetRight, Vector2.down, lengthToGround, groundLayer); ;
+        isGroundedLeft = Physics2D.Raycast(transform.position - raycastOffsetLeft, Vector2.down, lengthToGround, groundLayer);
+        isGroundedRight = Physics2D.Raycast(transform.position + raycastOffsetRight, Vector2.down, lengthToGround, groundLayer); ;
+        isGrounded = isGroundedLeft || isGroundedRight;
+
         isOnLeftWall = Physics2D.Raycast(transform.position, Vector2.left, lengthToWall, groundLayer);
         isOnRightWall = Physics2D.Raycast(transform.position, Vector2.right, lengthToWall, groundLayer);
         isOnWall = isOnLeftWall || isOnRightWall;
@@ -92,6 +104,10 @@ public class Player : MonoBehaviour
         isBangingHeadLeft = Physics2D.Raycast(transform.position - cornerCorrectionOffsetLeft, Vector2.up, cornerCorrectionLength, groundLayer) && !Physics2D.Raycast(transform.position - cornerCorrectionOffsetLeft + cornerCorrectionInnerOffset, Vector2.up, cornerCorrectionLength, groundLayer);;
         isBangingHeadRight = Physics2D.Raycast(transform.position + cornerCorrectionOffsetRight, Vector2.up, cornerCorrectionLength, groundLayer) && !Physics2D.Raycast(transform.position + cornerCorrectionOffsetRight - cornerCorrectionInnerOffset, Vector2.up, cornerCorrectionLength, groundLayer);;
         isBangingHeadBoth = isBangingHeadLeft && isBangingHeadRight;
+        
+        bool feetOnLeftWall = Physics2D.Raycast(transform.position + climbLedgeOffset, Vector2.left, lengthToWall, groundLayer);
+        bool feetOnRightWall = Physics2D.Raycast(transform.position + climbLedgeOffset, Vector2.right, lengthToWall, groundLayer);
+        feetTouchingWall = feetOnLeftWall || feetOnRightWall;
 
 
         if(!wasGrounded && isGrounded)
@@ -184,10 +200,28 @@ public class Player : MonoBehaviour
 
     private void MoveCharacter(Vector2 input)
     {
-        if(grabbing != null && isOnWall)
+        //climbing up.
+        if(grabbing != null)
         {
-            rb.velocity = new Vector2(0, input.y * climbSpeed);
-            return;
+            // still on wall, we can climb
+            if (isOnWall)
+            {
+                rb.velocity = new Vector2(0, input.y * climbSpeed);
+                return;
+            }
+            
+            // only feet left on wall, we have to climb the ledge
+            if(feetTouchingWall)
+            {
+                if (climbingLedge != null)
+                {
+                    return;
+                }
+
+                climbingLedge = ClimbLedge();
+                StartCoroutine(climbingLedge);
+                return;
+            }
         }
         rb.velocity += Vector2.right * (input.x * runSpeed * Time.deltaTime);
         if(Mathf.Abs(rb.velocity.x) > maxSpeed && !dashing)
@@ -196,6 +230,31 @@ public class Player : MonoBehaviour
         }
     }
 
+    private IEnumerator ClimbLedge()
+    {
+        while (feetTouchingWall)
+        {
+            rb.AddForce(Vector2.up, ForceMode2D.Impulse);
+            yield return new WaitForEndOfFrame();
+        }
+
+        bc.enabled = false;
+
+        while (!isGroundedLeft || !isGroundedRight)
+        {
+            Vector2 velocity = spriteRenderer.flipX ? Vector2.right : Vector2.left;
+            velocity *= runSpeed * Time.deltaTime;
+            rb.velocity += velocity;
+            yield return new WaitForFixedUpdate();
+        }
+
+        rb.velocity = Vector2.zero;
+        bc.enabled = true;
+        StopCoroutine(grabbing);
+        climbingLedge = null;
+        grabbing = null;
+    }
+    
     private void Jump()
     {
         Vector2 jumpDirection = Vector2.up;
@@ -261,8 +320,14 @@ public class Player : MonoBehaviour
         Gizmos.color = Color.red;
         Gizmos.DrawLine(transform.position + raycastOffsetRight, transform.position + raycastOffsetRight + Vector3.down * lengthToGround);
         Gizmos.DrawLine(transform.position - raycastOffsetLeft, transform.position - raycastOffsetLeft + Vector3.down * lengthToGround);
+        
+        //climbing (hands)
         Gizmos.DrawLine(transform.position, transform.position + Vector3.left * lengthToWall);
         Gizmos.DrawLine(transform.position, transform.position + Vector3.right * lengthToWall);
+        
+        //climbing (ledge)
+        Gizmos.DrawLine(transform.position + climbLedgeOffset, transform.position + climbLedgeOffset + Vector3.left * lengthToWall);
+        Gizmos.DrawLine(transform.position + climbLedgeOffset, transform.position + climbLedgeOffset + Vector3.right * lengthToWall);
         
         Gizmos.DrawLine(transform.position + cornerCorrectionOffsetRight - cornerCorrectionInnerOffset, transform.position + cornerCorrectionOffsetRight - cornerCorrectionInnerOffset + Vector3.up * cornerCorrectionLength);
         Gizmos.DrawLine(transform.position - cornerCorrectionOffsetLeft + cornerCorrectionInnerOffset, transform.position - cornerCorrectionOffsetLeft + cornerCorrectionInnerOffset + Vector3.up * cornerCorrectionLength);
@@ -359,11 +424,9 @@ public class Player : MonoBehaviour
     {
         while (stamina > 0)
         {
-            stamina -= 5;
-            Debug.Log(String.Format("stamina {0}", stamina));
+            stamina -= 0;
             yield return new WaitForSeconds(0.1f);
         }
-        StopCoroutine(grabbing);
         grabbing = null;
     }
 

@@ -21,6 +21,9 @@ public class Player : MonoBehaviour
     public float drag = 4.0f;
     public float jumpingGravity = 1.0f;
     public float fallMultiplier = 2.5f;
+    // WallSlide
+    public bool wallSlide;
+    public float slideSpeed = 3;
 
     // dash
     public float dashSpeed = 10;
@@ -28,7 +31,6 @@ public class Player : MonoBehaviour
     public float startDashTime = 0.1f;
     public bool hasDashed = false;
     private bool dashing = false;
-
 
     // buffered jumping
     private bool jumping = false;
@@ -38,6 +40,7 @@ public class Player : MonoBehaviour
     // coyote time
     private float lastValidGroundTouch;
     public float groundTouchedValidTil = 0.25f;
+
 
     [Header("Components")]
     public GameObject spriteHolder;
@@ -123,6 +126,12 @@ public class Player : MonoBehaviour
         if(isGrounded && grabbing == null)
         {
             stamina = 100;
+        }
+
+        if (isOnWall && !isGrounded)
+        {
+            wallSlide = true;
+            WallSlide();
         }
     }
 
@@ -265,7 +274,7 @@ public class Player : MonoBehaviour
         {
             jumpDirection += isOnLeftWall ? Vector2.right : Vector2.left;
             changeDirection = true;
-        } 
+        }
         animator.SetTrigger("isJumping");
         rb.velocity = new Vector2(rb.velocity.x, 0);
         rb.AddForce(jumpDirection * jumpForce, ForceMode2D.Impulse);
@@ -472,7 +481,18 @@ public class Player : MonoBehaviour
             dashing = false;
         }
     }
-    
-    
+
+
+    private void WallSlide()
+    {
+        bool pushingWall = false;
+        if ((rb.velocity.x > 0 && isOnRightWall) || (rb.velocity.x < 0 && isOnLeftWall))
+        {
+            pushingWall = true;
+        }
+        float push = pushingWall ? 0 : rb.velocity.x;
+
+        rb.velocity = new Vector2(push, -slideSpeed);
+    }
 
 }

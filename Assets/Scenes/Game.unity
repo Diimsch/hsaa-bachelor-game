@@ -4519,7 +4519,7 @@ GameObject:
   - component: {fileID: 755726535}
   - component: {fileID: 755726534}
   m_Layer: 5
-  m_Name: MessageCanvas
+  m_Name: DialogCanvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5427,6 +5427,8 @@ MonoBehaviour:
   drag: 4
   jumpingGravity: 2
   fallMultiplier: 3
+  wallSlide: 0
+  slideSpeed: 3
   dashSpeed: 25
   startDashTime: 0.1
   hasDashed: 0
@@ -10676,6 +10678,10 @@ PrefabInstance:
       propertyPath: dialog
       value: 
       objectReference: {fileID: 0}
+    - target: {fileID: 7471033775602357361, guid: 13a19cdb34fc64c47aa824af8840add4, type: 3}
+      propertyPath: dialogCanvas
+      value: 
+      objectReference: {fileID: 755726537}
     - target: {fileID: 7471033775602357361, guid: 13a19cdb34fc64c47aa824af8840add4, type: 3}
       propertyPath: activeTextColor.a
       value: 1

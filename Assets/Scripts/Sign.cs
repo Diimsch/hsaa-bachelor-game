@@ -9,7 +9,7 @@ public class Sign : MonoBehaviour
 {
     private SpriteRenderer sr;
 
-    public Dialog dialog;
+    public Canvas dialogCanvas;
     public Canvas canvas;
     public TMP_Text text;
 
@@ -20,18 +20,15 @@ public class Sign : MonoBehaviour
     public Sprite activatableSprite;
     public Sprite activatedSprite;
 
-    private bool triggered;
+    private Dialog dialog;
 
+    private bool triggered;
     private bool interacting;
     // Start is called before the first frame update
     void Start()
     {
+        dialog = dialogCanvas.GetComponent<Dialog>();
         sr = GetComponent<SpriteRenderer>();
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
     }
 
     private void OnTriggerEnter2D(Collider2D other)
@@ -48,7 +45,7 @@ public class Sign : MonoBehaviour
         canvas.enabled = false;
         sr.sprite = normalSprite;
         text.color = normalTextColor;
-        Dialog.Instance.Clear();
+        dialog.Clear();
     }
 
     public void OnInteract(InputAction.CallbackContext ctx)
@@ -65,7 +62,7 @@ public class Sign : MonoBehaviour
                 {
                     sr.sprite = activatableSprite;
                     text.color = normalTextColor;
-                    Dialog.Instance.Clear();
+                    dialog.Clear();
                     interacting = false;
                 }
                 else
@@ -73,7 +70,7 @@ public class Sign : MonoBehaviour
                     sr.sprite = activatedSprite;
                     text.color = activeTextColor;
                     interacting = true;
-                    Dialog.Instance.PushText("Game Controls:\nJump - [SPACE]\nClimb - [K]");
+                    dialog.PushText("Game Controls:\nJump - [SPACE]\nClimb - [K]\nBoost - [J]");
                 }
                 break;
         }

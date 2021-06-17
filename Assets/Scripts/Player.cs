@@ -501,19 +501,16 @@ public class Player : MonoBehaviour
 
     private IEnumerator Die()
     {
-        Destroy(gameObject);
         yield return new WaitForSeconds(3);
         SceneManager.LoadScene("Game");
     }
     
     private void WallSlide()
     {
-        bool pushingWall = false;
-        if ((dir.x > 0 && isOnRightWall) || (dir.x < 0 && isOnLeftWall))
-        {
-            pushingWall = true;
-        }
-        float push = pushingWall ? 0 : rb.velocity.x;
+        Vector2 currentVelocity = rb.velocity;
+        bool pushingWall = currentVelocity.x > 0 && isOnRightWall 
+                           || currentVelocity.x < 0 && isOnLeftWall;
+        float push = pushingWall ? 0 : currentVelocity.x;
 
         rb.velocity = new Vector2(push, -slideSpeed);
     }

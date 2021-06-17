@@ -5,17 +5,17 @@
     <key>CFBundleDevelopmentRegion</key>
     <string>English</string>
     <key>CFBundleExecutable</key>
-    <string>BachelorGame</string>
+    <string>GET THE BACHELOR</string>
     <key>CFBundleGetInfoString</key>
     <string>Unity Player version 2020.3.3f1 (76626098c1c4). (c) 2021 Unity Technologies ApS. All rights reserved.</string>
     <key>CFBundleIconFile</key>
     <string>PlayerIcon.icns</string>
     <key>CFBundleIdentifier</key>
-    <string>com.DefaultCompany.BachelorGame</string>
+    <string>com.ThomasSchmidtAdrianBusse.GETTHEBACHELOR</string>
     <key>CFBundleInfoDictionaryVersion</key>
     <string>6.0</string>
     <key>CFBundleName</key>
-    <string>BachelorGame</string>
+    <string>GET THE BACHELOR</string>
     <key>CFBundlePackageType</key>
     <string>APPL</string>
     <key>CFBundleShortVersionString</key>

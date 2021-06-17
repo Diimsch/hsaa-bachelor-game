@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
 
 public class Player : MonoBehaviour
 {
@@ -235,14 +236,15 @@ public class Player : MonoBehaviour
         while (feetTouchingWall)
         {
             rb.AddForce(Vector2.up, ForceMode2D.Impulse);
-            yield return new WaitForEndOfFrame();
+            yield return new WaitForFixedUpdate();
         }
-
+     
+        spriteRenderer.flipX = !spriteRenderer.flipX;
+        rb.velocity = Vector2.zero;
         bc.enabled = false;
-
         while (!isGroundedLeft || !isGroundedRight)
         {
-            Vector2 velocity = spriteRenderer.flipX ? Vector2.right : Vector2.left;
+            Vector2 velocity = spriteRenderer.flipX ? Vector2.left : Vector2.right;
             velocity *= runSpeed * Time.deltaTime;
             rb.velocity += velocity;
             yield return new WaitForFixedUpdate();
@@ -250,9 +252,13 @@ public class Player : MonoBehaviour
 
         rb.velocity = Vector2.zero;
         bc.enabled = true;
-        StopCoroutine(grabbing);
+        if (grabbing != null)
+        {
+            StopCoroutine(grabbing);
+            grabbing = null;
+
+        }
         climbingLedge = null;
-        grabbing = null;
     }
     
     private void Jump()
@@ -280,9 +286,9 @@ public class Player : MonoBehaviour
         }
     }
 
-    private void UpdateDirection(Vector2 input)
+    private void UpdateDirection(Vector2 input, bool ignoreWall = false)
     {
-        if(grabbing != null)
+        if(grabbing != null && !ignoreWall)
         {
             if(isOnLeftWall)
             {
@@ -312,7 +318,7 @@ public class Player : MonoBehaviour
         animator.SetBool("isRunning", Mathf.Abs(rb.velocity.x) > 0.1f);
         animator.SetBool("isFalling", rb.velocity.y < -0.001f);
         animator.SetBool("isGrabbing", grabbing != null && isOnWall);
-        animator.SetBool("isClimbing", grabbing != null && isOnWall && Mathf.Abs(rb.velocity.y) > 0.1f);
+        animator.SetBool("isClimbing", grabbing != null && (isOnWall || feetTouchingWall) && Mathf.Abs(rb.velocity.y) > 0.1f);
     }
 
     private void OnDrawGizmos()
@@ -388,7 +394,6 @@ public class Player : MonoBehaviour
                 {
                     return;
                 }
-                Debug.Log("start climbing.");
                 grabbing = Grab();
                 StartCoroutine(grabbing);
                 break;
@@ -472,7 +477,24 @@ public class Player : MonoBehaviour
             dashing = false;
         }
     }
-    
-    
 
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.gameObject.CompareTag("Coin"))
+        {
+            Destroy(other.gameObject);
+        }
+
+        if (other.gameObject.CompareTag("Death"))
+        {
+            StartCoroutine(Die());
+        }
+    }
+
+    private IEnumerator Die()
+    {
+        Destroy(gameObject);
+        yield return new WaitForSeconds(3);
+        SceneManager.LoadScene("Game");
+    }
 }

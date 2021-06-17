@@ -52,7 +52,7 @@ public class Player : MonoBehaviour
 
     [Header("Collision")]
     [SerializeField]
-    private bool isGrounded = false;
+    public bool isGrounded = false;
     [SerializeField]
     private bool isGroundedLeft = false;
     [SerializeField]
@@ -121,6 +121,7 @@ public class Player : MonoBehaviour
         if (isGrounded || isOnWall)
         {
             lastValidGroundTouch = Time.time + groundTouchedValidTil;
+            wallSlide = false;
         }
         
         if(isGrounded && grabbing == null)
@@ -269,7 +270,7 @@ public class Player : MonoBehaviour
         climbingLedge = null;
     }
     
-    private void Jump()
+    public void Jump()
     {
         Vector2 jumpDirection = Vector2.up;
         // walljump
@@ -324,8 +325,9 @@ public class Player : MonoBehaviour
     private void UpdateAnimator(Vector2 input)
     {
         animator.SetBool("isRunning", Mathf.Abs(rb.velocity.x) > 0.1f);
-        animator.SetBool("isFalling", rb.velocity.y < -0.001f);
+        animator.SetBool("isFalling", !isOnWall && rb.velocity.y < -0.001f);
         animator.SetBool("isGrabbing", grabbing != null && isOnWall);
+        animator.SetBool("isSliding", isOnWall && !isGrounded && grabbing == null);
         animator.SetBool("isClimbing", grabbing != null && (isOnWall || feetTouchingWall) && Mathf.Abs(rb.velocity.y) > 0.1f);
     }
 
@@ -475,7 +477,6 @@ public class Player : MonoBehaviour
                 dashingDirection = dir;
                 rb.velocity += dir.normalized * dashSpeed;
             }
-
             hasDashed = true;
             dashing = true;
             float gravityScale = rb.gravityScale;

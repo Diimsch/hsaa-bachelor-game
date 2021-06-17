@@ -14,6 +14,10 @@ public class Menu : MonoBehaviour
     [SerializeField]
     private TMP_Text[] items;
     private int currentIndex;
+
+    [Header("Components")]
+    public GameObject student;
+
     public void OnUp(InputAction.CallbackContext ctx)
     {
         if (currentIndex - 1 < 0)
@@ -44,7 +48,7 @@ public class Menu : MonoBehaviour
         switch (currentIndex)
         {
             case 0:
-                SceneManager.LoadScene("Game");
+                StartCoroutine(start());
                 break;
             case 1:
 #if UNITY_EDITOR
@@ -54,5 +58,14 @@ public class Menu : MonoBehaviour
 #endif
                 break;
         }
+    }
+
+    IEnumerator start()
+    {
+        student.GetComponent<Player>().Jump();
+        yield return new WaitForSeconds(0.55f);
+
+        SceneManager.LoadScene("Game");
+
     }
 }

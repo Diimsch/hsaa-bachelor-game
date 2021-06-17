@@ -498,6 +498,12 @@ public class Player : MonoBehaviour
         {
             StartCoroutine(Die());
         }
+
+        if (other.gameObject.CompareTag("Orb"))
+        {
+            Destroy(other.gameObject);
+            hasDashed = false;
+        }
     }
 
     private IEnumerator Die()

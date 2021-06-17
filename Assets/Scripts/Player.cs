@@ -128,7 +128,7 @@ public class Player : MonoBehaviour
             stamina = 100;
         }
 
-        if (isOnWall && !isGrounded)
+        if (isOnWall && grabbing == null && !isGrounded && rb.velocity.y <= 0)
         {
             wallSlide = true;
             WallSlide();
@@ -509,7 +509,7 @@ public class Player : MonoBehaviour
     private void WallSlide()
     {
         bool pushingWall = false;
-        if ((rb.velocity.x > 0 && isOnRightWall) || (rb.velocity.x < 0 && isOnLeftWall))
+        if ((dir.x > 0 && isOnRightWall) || (dir.x < 0 && isOnLeftWall))
         {
             pushingWall = true;
         }

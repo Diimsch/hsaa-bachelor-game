@@ -22,8 +22,10 @@ public class Sign : MonoBehaviour
 
     private Dialog dialog;
 
-    private bool triggered;
+    public bool triggered;
     private bool interacting;
+
+    public string signText;
     // Start is called before the first frame update
     void Start()
     {
@@ -33,6 +35,8 @@ public class Sign : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D other)
     {
+        Debug.Log("onEnter");
+
         sr.sprite = activatableSprite;
         canvas.enabled = true;
         triggered = true;
@@ -40,6 +44,8 @@ public class Sign : MonoBehaviour
 
     private void OnTriggerExit2D(Collider2D other)
     {
+        Debug.Log("onExit");
+
         triggered = false;
         interacting = false;
         canvas.enabled = false;
@@ -52,6 +58,8 @@ public class Sign : MonoBehaviour
     {
         if (!triggered)
         {
+            Debug.Log("moin");
+
             return;
         }
         
@@ -70,7 +78,7 @@ public class Sign : MonoBehaviour
                     sr.sprite = activatedSprite;
                     text.color = activeTextColor;
                     interacting = true;
-                    dialog.PushText("Game Controls:\nJump - [SPACE]\nClimb - [K]\nBoost - [J]");
+                    dialog.PushText(signText);
                 }
                 break;
         }

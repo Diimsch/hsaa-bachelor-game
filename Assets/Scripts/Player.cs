@@ -130,8 +130,9 @@ public class Player : MonoBehaviour
         }
 
         if (isOnWall && grabbing == null && !isGrounded && rb.velocity.y <= 0)
-        {
+        {   
             wallSlide = true;
+            spriteRenderer.flipX = isOnLeftWall ? false : true;
             WallSlide();
         }
     }
@@ -297,7 +298,7 @@ public class Player : MonoBehaviour
 
     private void UpdateDirection(Vector2 input, bool ignoreWall = false)
     {
-        if(grabbing != null && !ignoreWall)
+        if((grabbing != null || wallSlide == true) && !ignoreWall)
         {
             if(isOnLeftWall)
             {
@@ -327,7 +328,7 @@ public class Player : MonoBehaviour
         animator.SetBool("isRunning", Mathf.Abs(rb.velocity.x) > 0.1f);
         animator.SetBool("isFalling", !isOnWall && rb.velocity.y < -0.001f);
         animator.SetBool("isGrabbing", grabbing != null && isOnWall);
-        animator.SetBool("isSliding", isOnWall && !isGrounded && grabbing == null);
+        animator.SetBool("isSliding", isOnWall && !isGrounded && grabbing == null && wallSlide);
         animator.SetBool("isClimbing", grabbing != null && (isOnWall || feetTouchingWall) && Mathf.Abs(rb.velocity.y) > 0.1f);
     }
 

@@ -25,6 +25,8 @@ public class Sign : MonoBehaviour
 
     private bool triggered;
     private bool interacting;
+
+    public string signText;
     // Start is called before the first frame update
     void Start()
     {
@@ -65,7 +67,7 @@ public class Sign : MonoBehaviour
             sr.sprite = activatedSprite;
             text.color = activeTextColor;
             interacting = true;
-            dialog.PushText("Game Controls:\nJump - [SPACE]\nClimb - [K]\nBoost - [J]");
+            dialog.PushText(signText);
         }
     }
 }

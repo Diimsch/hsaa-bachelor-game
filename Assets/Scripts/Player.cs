@@ -41,6 +41,9 @@ public class Player : MonoBehaviour
     // coyote time
     private float lastValidGroundTouch;
     public float groundTouchedValidTil = 0.25f;
+    
+    //death
+    private bool isDead = false;
 
     [Header("Components")]
     public GameObject spriteHolder;
@@ -376,11 +379,20 @@ public class Player : MonoBehaviour
     
     public void OnMove(InputAction.CallbackContext ctx)
     {
+        if (isDead)
+        {
+            return;
+        }
         dir = ctx.ReadValue<Vector2>();
     }
 
     public void OnJump(InputAction.CallbackContext ctx)
     {
+        if (isDead)
+        {
+            return;
+        }
+        
         switch (ctx.phase)
         {
             case InputActionPhase.Started:
@@ -397,6 +409,10 @@ public class Player : MonoBehaviour
 
     public void OnGrab(InputAction.CallbackContext ctx)
     {
+        if (isDead)
+        {
+            return;
+        }
         switch (ctx.phase)
         {
             case InputActionPhase.Started:
@@ -447,6 +463,10 @@ public class Player : MonoBehaviour
 
     public void OnDash(InputAction.CallbackContext ctx)
     {
+        if (isDead)
+        {
+            return;
+        }
         switch (ctx.phase)
         {
             case InputActionPhase.Started:
@@ -508,6 +528,7 @@ public class Player : MonoBehaviour
 
     private IEnumerator Die()
     {
+        isDead = true;
         yield return new WaitForSeconds(3);
         SceneManager.LoadScene("Game");
     }
@@ -520,5 +541,17 @@ public class Player : MonoBehaviour
         float push = pushingWall ? 0 : currentVelocity.x;
 
         rb.velocity = new Vector2(push, -slideSpeed);
+    }
+    
+    public void OnInteract(InputAction.CallbackContext ctx)
+    {
+        switch (ctx.phase)
+        {
+            case InputActionPhase.Started: 
+                SignManager.InteractWithCurrentSign();
+                break;
+            default:
+                break;
+        }
     }
 }

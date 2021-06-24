@@ -27,7 +27,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7471033775602357362}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -5.5, y: -4.5, z: 0.5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
@@ -98,10 +98,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0be0cb3a441be45a8a53e30ea056748f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  dialog: {fileID: 0}
+  dialogCanvas: {fileID: 0}
   canvas: {fileID: 7471033776417607484}
   text: {fileID: 7471033776199409743}
-  activeTextColor: {r: 1, g: 0.5513562, b: 0, a: 0}
+  activeTextColor: {r: 1, g: 0.61216944, b: 0.023584902, a: 1}
   normalTextColor: {r: 1, g: 1, b: 1, a: 1}
   normalSprite: {fileID: 1949730731670058941, guid: 94fa057d1dbc5a9439c068559940fa4c, type: 3}
   activatableSprite: {fileID: -1888837539432032468, guid: 94fa057d1dbc5a9439c068559940fa4c, type: 3}
@@ -145,7 +145,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Actions: {fileID: -944628639613478452, guid: 7357d07e1d14440629f1aa407b36b3bf, type: 3}
-  m_NotificationBehavior: 2
+  m_NotificationBehavior: 3
   m_UIInputModule: {fileID: 0}
   m_DeviceLostEvent:
     m_PersistentCalls:
@@ -189,6 +189,18 @@ MonoBehaviour:
         m_CallState: 2
     m_ActionId: b4e9cacf-1934-4b66-be13-5ba4fb87cad5
     m_ActionName: Gameplay/Interact[/Keyboard/e]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 37478ac9-0505-4f5c-a876-6a361e4148f7
+    m_ActionName: Menu/Up[/Keyboard/w,/Keyboard/upArrow]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 91228787-2671-44ef-8a21-289b79969943
+    m_ActionName: Menu/Down[/Keyboard/s,/Keyboard/downArrow]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 52cd7836-95ea-4235-b988-50b6ec398b84
+    m_ActionName: Menu/Select[/Keyboard/enter,/Keyboard/space]
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: Keyboard
   m_DefaultActionMap: Gameplay
@@ -205,6 +217,7 @@ GameObject:
   - component: {fileID: 7471033776199409742}
   - component: {fileID: 7471033776199409740}
   - component: {fileID: 7471033776199409743}
+  - component: {fileID: 666539735}
   m_Layer: 5
   m_Name: TriggerEnterText
   m_TagString: Untagged
@@ -228,7 +241,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 5}
   m_SizeDelta: {x: 250, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &7471033776199409740
@@ -328,6 +341,25 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!95 &666539735
+Animator:
+  serializedVersion: 3
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7471033776199409737}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 4de8aaf03c00b4ae996a966954301223, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorControllerStateOnDisable: 0
 --- !u!1 &7471033776417607480
 GameObject:
   m_ObjectHideFlags: 0
@@ -374,7 +406,7 @@ Canvas:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7471033776417607480}
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_RenderMode: 2
   m_Camera: {fileID: 0}

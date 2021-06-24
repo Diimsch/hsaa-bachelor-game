@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -36,6 +37,7 @@ public class Sign : MonoBehaviour
         sr.sprite = activatableSprite;
         canvas.enabled = true;
         triggered = true;
+        SignManager.currentSign = this;
     }
 
     private void OnTriggerExit2D(Collider2D other)
@@ -46,33 +48,24 @@ public class Sign : MonoBehaviour
         sr.sprite = normalSprite;
         text.color = normalTextColor;
         dialog.Clear();
+        SignManager.currentSign = null;
     }
 
-    public void OnInteract(InputAction.CallbackContext ctx)
+    public void Interact()
     {
-        if (!triggered)
+        if (interacting)
         {
-            return;
+            sr.sprite = activatableSprite;
+            text.color = normalTextColor;
+            dialog.Clear();
+            interacting = false;
         }
-        
-        switch (ctx.phase)
+        else
         {
-            case InputActionPhase.Started:
-                if (interacting)
-                {
-                    sr.sprite = activatableSprite;
-                    text.color = normalTextColor;
-                    dialog.Clear();
-                    interacting = false;
-                }
-                else
-                {
-                    sr.sprite = activatedSprite;
-                    text.color = activeTextColor;
-                    interacting = true;
-                    dialog.PushText("Game Controls:\nJump - [SPACE]\nClimb - [K]\nBoost - [J]");
-                }
-                break;
+            sr.sprite = activatedSprite;
+            text.color = activeTextColor;
+            interacting = true;
+            dialog.PushText("Game Controls:\nJump - [SPACE]\nClimb - [K]\nBoost - [J]");
         }
     }
 }

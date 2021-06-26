@@ -486,23 +486,23 @@ public class Player : MonoBehaviour
             rb.velocity = Vector2.zero;
             dust.Play();
 
-            Vector2 dashingDirection;
-
-            if (dir.Equals(Vector2.zero))
+            float disableGravityForSecs = 0.05f;
+            if (dir.Equals(Vector2.zero) || dir.Equals(Vector2.left) || dir.Equals(Vector2.right))
             {
-                dashingDirection = spriteRenderer.flipX ? Vector2.left : Vector2.right;
+                Vector2 dashingDirection = spriteRenderer.flipX ? Vector2.left : Vector2.right;
+                dashingDirection += new Vector2(0, 0.1f);
                 rb.velocity += dashingDirection * dashSpeed;
+                disableGravityForSecs *= 2;
             }
             else
             {
-                dashingDirection = dir;
                 rb.velocity += dir.normalized * dashSpeed;
             }
             hasDashed = true;
             dashing = true;
             float gravityScale = rb.gravityScale;
             rb.gravityScale = 0;
-            yield return new WaitForSeconds(0.05f);
+            yield return new WaitForSeconds(disableGravityForSecs);
             rb.gravityScale = gravityScale;
             dashing = false;
         }

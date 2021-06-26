@@ -5,16 +5,16 @@ using UnityEngine;
 
 public class PlatformTop : MonoBehaviour
 {
-    private Collider2D collider;
+    private Collider2D _collider;
 
     private void Start()
     {
-        collider = GetComponent<Collider2D>();
+        _collider = GetComponent<Collider2D>();
     }
 
     private void OnTriggerExit2D(Collider2D other)
     {
-        collider.isTrigger = false;
+        _collider.isTrigger = false;
     }
     
     

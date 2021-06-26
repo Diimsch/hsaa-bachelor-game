@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Menu;
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -12,7 +13,7 @@ enum EMainMenuItem
     Exit,
 }
 
-public class MainMenu : MonoBehaviour
+public class MainMenu : MonoBehaviour, IMenu
 {
     public GameObject levelMenu; 
     
@@ -25,6 +26,11 @@ public class MainMenu : MonoBehaviour
 
     [Header("Components")]
     public GameObject student;
+
+    private void Start()
+    {
+        MenuManager.ActiveMenu = GetComponent<MainMenu>();
+    }
 
     public void OnUp(InputAction.CallbackContext ctx)
     {
@@ -50,28 +56,24 @@ public class MainMenu : MonoBehaviour
         items[(int) currentItem].color = activeTextColor;
     }
 
+    public void OnLeft(InputAction.CallbackContext ctx)
+    {
+        return;
+    }
+
+    public void OnRight(InputAction.CallbackContext ctx)
+    {
+        return;
+    }
+
     public void OnSelect(InputAction.CallbackContext ctx)
     {
-     
-        if (ctx.phase == InputActionPhase.Performed)
-        {
-            return;
-        }
-
-        if (ctx.phase == InputActionPhase.Canceled && currentItem == EMainMenuItem.Play)
-        {
-            levelMenu.GetComponent<PlayerInput>().enabled = true;
-            return;
-        }
-        
-        Debug.Log(ctx);
-        
         switch (currentItem)
         {
             case EMainMenuItem.Play:
                 gameObject.SetActive(false);
-                gameObject.GetComponent<PlayerInput>().enabled = false;
                 levelMenu.SetActive(true);
+                MenuManager.ActiveMenu = levelMenu.GetComponent<LevelMenu>();
                 break;
             case EMainMenuItem.Exit:
 #if UNITY_EDITOR

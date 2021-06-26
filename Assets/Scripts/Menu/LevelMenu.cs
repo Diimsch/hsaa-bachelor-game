@@ -116,4 +116,11 @@ public class LevelMenu : MonoBehaviour, IMenu
                 break;
         }
     }
+
+    public void OnEscape(InputAction.CallbackContext ctx)
+    {
+        gameObject.SetActive(false);
+        startMenu.SetActive(true);
+        MenuManager.ActiveMenu = startMenu.GetComponent<MainMenu>();
+    }
 }

@@ -1,7 +1,10 @@
 using System.Collections;
+using System.Numerics;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
+using Vector2 = UnityEngine.Vector2;
+using Vector3 = UnityEngine.Vector3;
 
 public class Player : MonoBehaviour
 {
@@ -41,6 +44,10 @@ public class Player : MonoBehaviour
     
     //death
     private bool _isDead = false;
+    
+    //pause
+    public GameObject pauseMenuObject;
+    private bool _isPaused = false;
 
     [Header("Components")]
     public GameObject spriteHolder;
@@ -148,6 +155,10 @@ public class Player : MonoBehaviour
 
     private void FixedUpdate()
     {
+        if (_isPaused || _isDead)
+        {
+            return;
+        }
         Vector2 currentDirection = dir;
 
         UpdateDirection(currentDirection);
@@ -563,5 +574,46 @@ public class Player : MonoBehaviour
             default:
                 break;
         }
+    }
+
+    public void OnPause(InputAction.CallbackContext ctx)
+    {
+        switch(ctx.phase)
+        {
+            case InputActionPhase.Started: 
+                Pause();
+                break;
+            default:
+                break;
+        }
+    }
+
+    public void Resume()
+    {
+        pauseMenuObject.SetActive(false);
+        GetComponent<PlayerInput>().SwitchCurrentActionMap("Gameplay");
+        _isPaused = false;
+    }
+
+    private void Pause()
+    {
+        pauseMenuObject.SetActive(true);
+        GetComponent<PlayerInput>().SwitchCurrentActionMap("Menu");
+        _isPaused = true;
+        StartCoroutine(StartPause());
+    }
+
+    private IEnumerator StartPause()
+    {
+        var gravityScale = _rb.gravityScale;
+        var velocity = _rb.velocity;
+
+        _rb.gravityScale = 0;
+        _rb.velocity = Vector2.zero;
+
+        yield return new WaitUntil(() => _isPaused == false);
+
+        _rb.gravityScale = gravityScale;
+        _rb.velocity = velocity;
     }
 }

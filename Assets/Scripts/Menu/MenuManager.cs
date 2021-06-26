@@ -58,4 +58,13 @@ public class MenuManager : MonoBehaviour, Menu.IMenu
         }
         _activeMenu.OnSelect(ctx);
     }
+
+    public void OnEscape(InputAction.CallbackContext ctx)
+    {
+        if (ctx.phase != InputActionPhase.Started)
+        {
+            return;
+        }
+        _activeMenu.OnEscape(ctx);
+    }
 }

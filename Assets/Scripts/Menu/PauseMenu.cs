@@ -7,52 +7,50 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 
-enum EMainMenuItem
+enum EPauseMenuItem
 {
-    Play,
+    Resume,
     Exit,
 }
 
-public class MainMenu : MonoBehaviour, IMenu
+public class PauseMenu : MonoBehaviour, IMenu
 {
-    public GameObject levelMenu; 
-    
     public Color activeTextColor;
     public Color normalTextColor;
     
     [SerializeField]
     private TMP_Text[] items;
-    private EMainMenuItem currentItem;
+    private EPauseMenuItem currentItem;
 
     [Header("Components")]
     public GameObject student;
 
     private void Start()
     {
-        MenuManager.ActiveMenu = GetComponent<MainMenu>();
+        MenuManager.ActiveMenu = GetComponent<PauseMenu>();
     }
 
     public void OnUp(InputAction.CallbackContext ctx)
     {
-        if (currentItem == EMainMenuItem.Play)
+        if (currentItem == EPauseMenuItem.Resume)
         {
             return;
         }
 
         items[(int) currentItem].color = normalTextColor;
-        currentItem = EMainMenuItem.Play;
+        currentItem = EPauseMenuItem.Resume;
         items[(int) currentItem].color = activeTextColor;
     }
 
     public void OnDown(InputAction.CallbackContext ctx)
     {
-        if (currentItem == EMainMenuItem.Exit)
+        if (currentItem == EPauseMenuItem.Exit)
         {
             return;
         }
 
         items[(int) currentItem].color = normalTextColor;
-        currentItem = EMainMenuItem.Exit;
+        currentItem = EPauseMenuItem.Exit;
         items[(int) currentItem].color = activeTextColor;
     }
 
@@ -70,32 +68,17 @@ public class MainMenu : MonoBehaviour, IMenu
     {
         switch (currentItem)
         {
-            case EMainMenuItem.Play:
-                gameObject.SetActive(false);
-                levelMenu.SetActive(true);
-                MenuManager.ActiveMenu = levelMenu.GetComponent<LevelMenu>();
+            case EPauseMenuItem.Resume:
+                student.GetComponent<Player>().Resume();
                 break;
-            case EMainMenuItem.Exit:
-#if UNITY_EDITOR
-                UnityEditor.EditorApplication.isPlaying = false;
-#else
-                Application.Quit();
-#endif
-                break;
+            case EPauseMenuItem.Exit:
+                 SceneManager.LoadScene("StartMenu");
+;                break;
         }
-    }
-
-    IEnumerator LoadLevel()
-    {
-        student.GetComponent<Player>().Jump();
-        yield return new WaitForSeconds(0.55f);
-
-        SceneManager.LoadScene("Game");
-
     }
 
     public void OnEscape(InputAction.CallbackContext ctx)
     {
-        return;
+        student.GetComponent<Player>().Resume();
     }
 }

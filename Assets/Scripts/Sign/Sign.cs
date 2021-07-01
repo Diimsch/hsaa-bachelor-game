@@ -22,8 +22,6 @@ public class Sign : MonoBehaviour
     public Sprite activatedSprite;
 
     private Dialog dialog;
-
-    private bool triggered;
     private bool interacting;
 
     public string signText;
@@ -38,13 +36,11 @@ public class Sign : MonoBehaviour
     {
         sr.sprite = activatableSprite;
         canvas.enabled = true;
-        triggered = true;
         SignManager.currentSign = this;
     }
 
     private void OnTriggerExit2D(Collider2D other)
     {
-        triggered = false;
         interacting = false;
         canvas.enabled = false;
         sr.sprite = normalSprite;

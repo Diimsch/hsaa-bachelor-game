@@ -1,18 +1,18 @@
-using System;
 using System.Collections;
-using System.Collections.Generic;
+using System.Numerics;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
+using Vector2 = UnityEngine.Vector2;
+using Vector3 = UnityEngine.Vector3;
 
 public class Player : MonoBehaviour
 {
     [Header("Player Input")]
     [SerializeField]
     private Vector2 dir;
-    [SerializeField]
-    private IEnumerator grabbing = null;
-    private int stamina = 100;
+    private IEnumerator _grabbing = null;
+    private int _stamina = 100;
 
     [Header("Movement")]
     public float runSpeed = 10.0f;
@@ -28,29 +28,33 @@ public class Player : MonoBehaviour
 
     // dash
     public float dashSpeed = 10;
-    private float dashTime;
+    private float _dashTime;
     public float startDashTime = 0.1f;
     public bool hasDashed = false;
-    private bool dashing = false;
+    private bool _dashing = false;
 
     // buffered jumping
-    private bool jumping = false;
+    private bool _jumping = false;
     public float jumpDelay = 0.25f;
-    private float lastJumped;
+    private float _lastJumped;
 
     // coyote time
-    private float lastValidGroundTouch;
+    private float _lastValidGroundTouch;
     public float groundTouchedValidTil = 0.25f;
     
     //death
-    private bool isDead = false;
+    private bool _isDead = false;
+    
+    //pause
+    public GameObject pauseMenuObject;
+    private bool _isPaused = false;
 
     [Header("Components")]
     public GameObject spriteHolder;
     public SpriteRenderer spriteRenderer;
     public Animator animator;
-    private Rigidbody2D rb;
-    private BoxCollider2D bc;
+    private Rigidbody2D _rb;
+    private BoxCollider2D _bc;
     public LayerMask groundLayer;
 
     [Header("Collision")]
@@ -83,36 +87,45 @@ public class Player : MonoBehaviour
     // climb ledge
     public Vector3 climbLedgeOffset;
     public bool feetTouchingWall = false;
-    private IEnumerator climbingLedge = null;
+    private IEnumerator _climbingLedge = null;
 
     [Header("Particles")]
     public ParticleSystem dust;
 
+    private static readonly int IsJumping = Animator.StringToHash("isJumping");
+    private static readonly int IsRunning = Animator.StringToHash("isRunning");
+    private static readonly int IsFalling = Animator.StringToHash("isFalling");
+    private static readonly int IsGrabbing = Animator.StringToHash("isGrabbing");
+    private static readonly int IsSliding = Animator.StringToHash("isSliding");
+    private static readonly int IsClimbing = Animator.StringToHash("isClimbing");
+
     // Start is called before the first frame update
     void Start()
     {
-        rb = GetComponent<Rigidbody2D>();
-        bc = GetComponent<BoxCollider2D>();
+        _rb = GetComponent<Rigidbody2D>();
+        _bc = GetComponent<BoxCollider2D>();
     }
 
     // Update is called once per frame
     void Update()
     {
+        Vector3 pos = transform.position;
+        
         bool wasGrounded = isGrounded;
-        isGroundedLeft = Physics2D.Raycast(transform.position - raycastOffsetLeft, Vector2.down, lengthToGround, groundLayer);
-        isGroundedRight = Physics2D.Raycast(transform.position + raycastOffsetRight, Vector2.down, lengthToGround, groundLayer); ;
+        isGroundedLeft = Physics2D.Raycast(pos - raycastOffsetLeft, Vector2.down, lengthToGround, groundLayer);
+        isGroundedRight = Physics2D.Raycast(pos + raycastOffsetRight, Vector2.down, lengthToGround, groundLayer);
         isGrounded = isGroundedLeft || isGroundedRight;
 
-        isOnLeftWall = Physics2D.Raycast(transform.position, Vector2.left, lengthToWall, groundLayer);
-        isOnRightWall = Physics2D.Raycast(transform.position, Vector2.right, lengthToWall, groundLayer);
+        isOnLeftWall = Physics2D.Raycast(pos, Vector2.left, lengthToWall, groundLayer);
+        isOnRightWall = Physics2D.Raycast(pos, Vector2.right, lengthToWall, groundLayer);
         isOnWall = isOnLeftWall || isOnRightWall;
         
-        isBangingHeadLeft = Physics2D.Raycast(transform.position - cornerCorrectionOffsetLeft, Vector2.up, cornerCorrectionLength, groundLayer) && !Physics2D.Raycast(transform.position - cornerCorrectionOffsetLeft + cornerCorrectionInnerOffset, Vector2.up, cornerCorrectionLength, groundLayer);;
-        isBangingHeadRight = Physics2D.Raycast(transform.position + cornerCorrectionOffsetRight, Vector2.up, cornerCorrectionLength, groundLayer) && !Physics2D.Raycast(transform.position + cornerCorrectionOffsetRight - cornerCorrectionInnerOffset, Vector2.up, cornerCorrectionLength, groundLayer);;
+        isBangingHeadLeft = Physics2D.Raycast(pos - cornerCorrectionOffsetLeft, Vector2.up, cornerCorrectionLength, groundLayer) && !Physics2D.Raycast(pos - cornerCorrectionOffsetLeft + cornerCorrectionInnerOffset, Vector2.up, cornerCorrectionLength, groundLayer);
+        isBangingHeadRight = Physics2D.Raycast(pos + cornerCorrectionOffsetRight, Vector2.up, cornerCorrectionLength, groundLayer) && !Physics2D.Raycast(pos + cornerCorrectionOffsetRight - cornerCorrectionInnerOffset, Vector2.up, cornerCorrectionLength, groundLayer);
         isBangingHeadBoth = isBangingHeadLeft && isBangingHeadRight;
         
-        bool feetOnLeftWall = Physics2D.Raycast(transform.position + climbLedgeOffset, Vector2.left, lengthToWall, groundLayer);
-        bool feetOnRightWall = Physics2D.Raycast(transform.position + climbLedgeOffset, Vector2.right, lengthToWall, groundLayer);
+        bool feetOnLeftWall = Physics2D.Raycast(pos + climbLedgeOffset, Vector2.left, lengthToWall, groundLayer);
+        bool feetOnRightWall = Physics2D.Raycast(pos + climbLedgeOffset, Vector2.right, lengthToWall, groundLayer);
         feetTouchingWall = feetOnLeftWall || feetOnRightWall;
 
 
@@ -123,25 +136,29 @@ public class Player : MonoBehaviour
 
         if (isGrounded || isOnWall)
         {
-            lastValidGroundTouch = Time.time + groundTouchedValidTil;
+            _lastValidGroundTouch = Time.time + groundTouchedValidTil;
             wallSlide = false;
         }
         
-        if(isGrounded && grabbing == null)
+        if(isGrounded && _grabbing == null)
         {
-            stamina = 100;
+            _stamina = 100;
         }
 
-        if (isOnWall && grabbing == null && !isGrounded && rb.velocity.y <= 0)
+        if (isOnWall && _grabbing == null && !isGrounded && _rb.velocity.y <= 0)
         {   
             wallSlide = true;
-            spriteRenderer.flipX = isOnLeftWall ? false : true;
+            spriteRenderer.flipX = !isOnLeftWall;
             WallSlide();
         }
     }
 
     private void FixedUpdate()
     {
+        if (_isPaused || _isDead)
+        {
+            return;
+        }
         Vector2 currentDirection = dir;
 
         UpdateDirection(currentDirection);
@@ -149,9 +166,9 @@ public class Player : MonoBehaviour
 
         MoveCharacter(currentDirection);
 
-        if(lastJumped > Time.time && lastValidGroundTouch > Time.time)
+        if(_lastJumped > Time.time && _lastValidGroundTouch > Time.time)
         {
-            lastValidGroundTouch = 0;
+            _lastValidGroundTouch = 0;
             Jump();
         }
 
@@ -162,52 +179,53 @@ public class Player : MonoBehaviour
     {
         if ((isBangingHeadLeft || isBangingHeadRight) && !isBangingHeadBoth)
         {
-            bc.enabled = false;
+            _bc.enabled = false;
 
             Vector2 correctionVelocity = isBangingHeadLeft ? Vector2.right : Vector2.left;
-            correctionVelocity.y = rb.velocity.y;
+            correctionVelocity.y = _rb.velocity.y;
 
-            rb.velocity = correctionVelocity;
+            _rb.velocity = correctionVelocity;
         }
         else
         {
-            if (!bc.enabled)
+            if (!_bc.enabled)
             {
-                bc.enabled = true;
-                rb.velocity = new Vector2(0, rb.velocity.y);
+                _bc.enabled = true;
+                _rb.velocity = new Vector2(0, _rb.velocity.y);
             }
         }
 
-        if (dashing)
+        if (_dashing)
         {
             return;
         }
 
-        if(grabbing != null && isOnWall)
+        if(_grabbing != null && isOnWall)
         {
-            rb.gravityScale = 0;
+            _rb.gravityScale = 0;
             return;
         }
 
         if (isGrounded)
         {
-            bool changingDirection = (input.x < 0 && rb.velocity.x > 0) || (input.x > 0 && rb.velocity.x < 0);
+            // var velocity = _rb.velocity;
+            // var changingDirection = input.x < 0 && velocity.x > 0 || input.x > 0 && velocity.x < 0;
             // rb.drag = Mathf.Abs(input.x) == 0 || changingDirection ? drag : 0;
 
-            rb.gravityScale = 0;
+            _rb.gravityScale = 0;
             hasDashed = false;
         }
         else
         {
-            rb.gravityScale = jumpingGravity;
+            _rb.gravityScale = jumpingGravity;
             // rb.drag = drag * 0.15f;
-            if (rb.velocity.y < 0)
+            if (_rb.velocity.y < 0)
             {
-                rb.gravityScale *= fallMultiplier;
+                _rb.gravityScale *= fallMultiplier;
             }
-            else if (rb.velocity.y > 0 && !jumping)
+            else if (_rb.velocity.y > 0 && !_jumping)
             {
-                rb.gravityScale *= fallMultiplier / 2;
+                _rb.gravityScale *= fallMultiplier / 2;
             }
         }
     }
@@ -215,32 +233,32 @@ public class Player : MonoBehaviour
     private void MoveCharacter(Vector2 input)
     {
         //climbing up.
-        if(grabbing != null)
+        if(_grabbing != null)
         {
             // still on wall, we can climb
             if (isOnWall)
             {
-                rb.velocity = new Vector2(0, input.y * climbSpeed);
+                _rb.velocity = new Vector2(0, input.y * climbSpeed);
                 return;
             }
             
             // only feet left on wall, we have to climb the ledge
             if(feetTouchingWall)
             {
-                if (climbingLedge != null)
+                if (_climbingLedge != null)
                 {
                     return;
                 }
 
-                climbingLedge = ClimbLedge();
-                StartCoroutine(climbingLedge);
+                _climbingLedge = ClimbLedge();
+                StartCoroutine(_climbingLedge);
                 return;
             }
         }
-        rb.velocity += Vector2.right * (input.x * runSpeed * Time.deltaTime);
-        if(Mathf.Abs(rb.velocity.x) > maxSpeed && !dashing)
+        _rb.velocity += Vector2.right * (input.x * runSpeed * Time.deltaTime);
+        if(Mathf.Abs(_rb.velocity.x) > maxSpeed && !_dashing)
         {
-            rb.velocity = new Vector2(Mathf.Sign(rb.velocity.x) * maxSpeed, rb.velocity.y);
+            _rb.velocity = new Vector2(Mathf.Sign(_rb.velocity.x) * maxSpeed, _rb.velocity.y);
         }
     }
 
@@ -248,30 +266,30 @@ public class Player : MonoBehaviour
     {
         while (feetTouchingWall)
         {
-            rb.AddForce(Vector2.up, ForceMode2D.Impulse);
+            _rb.AddForce(Vector2.up, ForceMode2D.Impulse);
             yield return new WaitForFixedUpdate();
         }
      
         spriteRenderer.flipX = !spriteRenderer.flipX;
-        rb.velocity = Vector2.zero;
-        bc.enabled = false;
+        _rb.velocity = Vector2.zero;
+        _bc.enabled = false;
         while (!isGroundedLeft || !isGroundedRight)
         {
             Vector2 velocity = spriteRenderer.flipX ? Vector2.left : Vector2.right;
             velocity *= runSpeed * Time.deltaTime;
-            rb.velocity += velocity;
+            _rb.velocity += velocity;
             yield return new WaitForFixedUpdate();
         }
 
-        rb.velocity = Vector2.zero;
-        bc.enabled = true;
-        if (grabbing != null)
+        _rb.velocity = Vector2.zero;
+        _bc.enabled = true;
+        if (_grabbing != null)
         {
-            StopCoroutine(grabbing);
-            grabbing = null;
+            StopCoroutine(_grabbing);
+            _grabbing = null;
 
         }
-        climbingLedge = null;
+        _climbingLedge = null;
     }
     
     public void Jump()
@@ -285,10 +303,10 @@ public class Player : MonoBehaviour
             jumpDirection += isOnLeftWall ? Vector2.right : Vector2.left;
             changeDirection = true;
         }
-        animator.SetTrigger("isJumping");
-        rb.velocity = new Vector2(rb.velocity.x, 0);
-        rb.AddForce(jumpDirection * jumpForce, ForceMode2D.Impulse);
-        lastJumped = 0;
+        animator.SetTrigger(IsJumping);
+        _rb.velocity = new Vector2(_rb.velocity.x, 0);
+        _rb.AddForce(jumpDirection * jumpForce, ForceMode2D.Impulse);
+        _lastJumped = 0;
 
         dust.Play();
         StartCoroutine(SqueezeSprites(new Vector2(0.8f, 1.25f), 0.05f));
@@ -301,7 +319,7 @@ public class Player : MonoBehaviour
 
     private void UpdateDirection(Vector2 input, bool ignoreWall = false)
     {
-        if((grabbing != null || wallSlide == true) && !ignoreWall)
+        if((_grabbing != null || wallSlide) && !ignoreWall)
         {
             if(isOnLeftWall)
             {
@@ -328,32 +346,34 @@ public class Player : MonoBehaviour
 
     private void UpdateAnimator(Vector2 input)
     {
-        animator.SetBool("isRunning", Mathf.Abs(rb.velocity.x) > 0.1f);
-        animator.SetBool("isFalling", !isOnWall && rb.velocity.y < -0.001f);
-        animator.SetBool("isGrabbing", grabbing != null && isOnWall);
-        animator.SetBool("isSliding", isOnWall && !isGrounded && grabbing == null && wallSlide);
-        animator.SetBool("isClimbing", grabbing != null && (isOnWall || feetTouchingWall) && Mathf.Abs(rb.velocity.y) > 0.1f);
+        animator.SetBool(IsRunning, Mathf.Abs(_rb.velocity.x) > 0.1f);
+        animator.SetBool(IsFalling, !isOnWall && _rb.velocity.y < -0.001f);
+        animator.SetBool(IsGrabbing, _grabbing != null && isOnWall);
+        animator.SetBool(IsSliding, isOnWall && !isGrounded && _grabbing == null && wallSlide);
+        animator.SetBool(IsClimbing, _grabbing != null && (isOnWall || feetTouchingWall) && Mathf.Abs(_rb.velocity.y) > 0.1f);
     }
 
     private void OnDrawGizmos()
     {
+        var pos = transform.position;
+        
         Gizmos.color = Color.red;
-        Gizmos.DrawLine(transform.position + raycastOffsetRight, transform.position + raycastOffsetRight + Vector3.down * lengthToGround);
-        Gizmos.DrawLine(transform.position - raycastOffsetLeft, transform.position - raycastOffsetLeft + Vector3.down * lengthToGround);
+        Gizmos.DrawLine(pos + raycastOffsetRight, pos + raycastOffsetRight + Vector3.down * lengthToGround);
+        Gizmos.DrawLine(pos - raycastOffsetLeft, pos - raycastOffsetLeft + Vector3.down * lengthToGround);
         
         //climbing (hands)
-        Gizmos.DrawLine(transform.position, transform.position + Vector3.left * lengthToWall);
-        Gizmos.DrawLine(transform.position, transform.position + Vector3.right * lengthToWall);
+        Gizmos.DrawLine(pos, pos + Vector3.left * lengthToWall);
+        Gizmos.DrawLine(pos, pos + Vector3.right * lengthToWall);
         
         //climbing (ledge)
-        Gizmos.DrawLine(transform.position + climbLedgeOffset, transform.position + climbLedgeOffset + Vector3.left * lengthToWall);
-        Gizmos.DrawLine(transform.position + climbLedgeOffset, transform.position + climbLedgeOffset + Vector3.right * lengthToWall);
+        Gizmos.DrawLine(pos + climbLedgeOffset, pos + climbLedgeOffset + Vector3.left * lengthToWall);
+        Gizmos.DrawLine(pos + climbLedgeOffset, pos + climbLedgeOffset + Vector3.right * lengthToWall);
         
-        Gizmos.DrawLine(transform.position + cornerCorrectionOffsetRight - cornerCorrectionInnerOffset, transform.position + cornerCorrectionOffsetRight - cornerCorrectionInnerOffset + Vector3.up * cornerCorrectionLength);
-        Gizmos.DrawLine(transform.position - cornerCorrectionOffsetLeft + cornerCorrectionInnerOffset, transform.position - cornerCorrectionOffsetLeft + cornerCorrectionInnerOffset + Vector3.up * cornerCorrectionLength);
+        Gizmos.DrawLine(pos + cornerCorrectionOffsetRight - cornerCorrectionInnerOffset, pos + cornerCorrectionOffsetRight - cornerCorrectionInnerOffset + Vector3.up * cornerCorrectionLength);
+        Gizmos.DrawLine(pos - cornerCorrectionOffsetLeft + cornerCorrectionInnerOffset, pos - cornerCorrectionOffsetLeft + cornerCorrectionInnerOffset + Vector3.up * cornerCorrectionLength);
 
-        Gizmos.DrawLine(transform.position + cornerCorrectionOffsetRight, transform.position + cornerCorrectionOffsetRight + Vector3.up * cornerCorrectionLength);
-        Gizmos.DrawLine(transform.position - cornerCorrectionOffsetLeft, transform.position - cornerCorrectionOffsetLeft + Vector3.up * cornerCorrectionLength);
+        Gizmos.DrawLine(pos + cornerCorrectionOffsetRight, pos + cornerCorrectionOffsetRight + Vector3.up * cornerCorrectionLength);
+        Gizmos.DrawLine(pos - cornerCorrectionOffsetLeft, pos - cornerCorrectionOffsetLeft + Vector3.up * cornerCorrectionLength);
     }
 
     IEnumerator SqueezeSprites(Vector2 squeeze, float animTime)
@@ -380,7 +400,7 @@ public class Player : MonoBehaviour
     
     public void OnMove(InputAction.CallbackContext ctx)
     {
-        if (isDead)
+        if (_isDead)
         {
             return;
         }
@@ -389,7 +409,7 @@ public class Player : MonoBehaviour
 
     public void OnJump(InputAction.CallbackContext ctx)
     {
-        if (isDead)
+        if (_isDead)
         {
             return;
         }
@@ -397,56 +417,56 @@ public class Player : MonoBehaviour
         switch (ctx.phase)
         {
             case InputActionPhase.Started:
-                lastJumped = Time.time + jumpDelay;
+                _lastJumped = Time.time + jumpDelay;
                 break;
             case InputActionPhase.Performed:
-                jumping = true;
+                _jumping = true;
                 break;
             default:
-                jumping = false;
+                _jumping = false;
                 break;
         }
     }
 
     public void OnGrab(InputAction.CallbackContext ctx)
     {
-        if (isDead)
+        if (_isDead)
         {
             return;
         }
         switch (ctx.phase)
         {
             case InputActionPhase.Started:
-                if (!isOnWall || stamina <= 0)
+                if (!isOnWall || _stamina <= 0)
                 {
                     return;
                 }
-                grabbing = Grab();
-                StartCoroutine(grabbing);
+                _grabbing = Grab();
+                StartCoroutine(_grabbing);
                 break;
             case InputActionPhase.Performed:
                 if (!isOnWall)
                 {
-                    if (grabbing != null)
+                    if (_grabbing != null)
                     {
-                        StopCoroutine(grabbing);
-                        grabbing = null;
+                        StopCoroutine(_grabbing);
+                        _grabbing = null;
                     }
                 }
                 else
                 {
-                    if (grabbing == null && stamina > 0)
+                    if (_grabbing == null && _stamina > 0)
                     {
-                        grabbing = Grab();
-                        StartCoroutine(grabbing);
+                        _grabbing = Grab();
+                        StartCoroutine(_grabbing);
                     }
                 }
                 break;
             default:
-                if (grabbing != null)
+                if (_grabbing != null)
                 {
-                    StopCoroutine(grabbing);
-                    grabbing = null;
+                    StopCoroutine(_grabbing);
+                    _grabbing = null;
                 }
                 break;
         }
@@ -454,17 +474,17 @@ public class Player : MonoBehaviour
 
     private IEnumerator Grab()
     {
-        while (stamina > 0)
+        while (_stamina > 0)
         {
-            stamina -= 0;
+            _stamina -= 0;
             yield return new WaitForSeconds(0.1f);
         }
-        grabbing = null;
+        _grabbing = null;
     }
 
     public void OnDash(InputAction.CallbackContext ctx)
     {
-        if (isDead)
+        if (_isDead)
         {
             return;
         }
@@ -481,31 +501,31 @@ public class Player : MonoBehaviour
 
     private IEnumerator Dash()
     {
-        if (!hasDashed)
+        if (hasDashed)
+            yield break;
+        
+        _rb.velocity = Vector2.zero;
+        dust.Play();
+
+        float disableGravityForSecs = 0.05f;
+        if (dir.Equals(Vector2.zero) || dir.Equals(Vector2.left) || dir.Equals(Vector2.right))
         {
-            rb.velocity = Vector2.zero;
-            dust.Play();
-
-            Vector2 dashingDirection;
-
-            if (dir.Equals(Vector2.zero))
-            {
-                dashingDirection = spriteRenderer.flipX ? Vector2.left : Vector2.right;
-                rb.velocity += dashingDirection * dashSpeed;
-            }
-            else
-            {
-                dashingDirection = dir;
-                rb.velocity += dir.normalized * dashSpeed;
-            }
-            hasDashed = true;
-            dashing = true;
-            float gravityScale = rb.gravityScale;
-            rb.gravityScale = 0;
-            yield return new WaitForSeconds(0.05f);
-            rb.gravityScale = gravityScale;
-            dashing = false;
+            Vector2 dashingDirection = spriteRenderer.flipX ? Vector2.left : Vector2.right;
+            dashingDirection += new Vector2(0, 0.1f);
+            _rb.velocity += dashingDirection * dashSpeed;
+            disableGravityForSecs *= 2;
         }
+        else
+        {
+            _rb.velocity += dir.normalized * dashSpeed;
+        }
+        hasDashed = true;
+        _dashing = true;
+        float gravityScale = _rb.gravityScale;
+        _rb.gravityScale = 0;
+        yield return new WaitForSeconds(disableGravityForSecs);
+        _rb.gravityScale = gravityScale;
+        _dashing = false;
     }
 
     private void OnTriggerEnter2D(Collider2D other)
@@ -529,7 +549,7 @@ public class Player : MonoBehaviour
 
     private IEnumerator Die()
     {
-        isDead = true;
+        _isDead = true;
         yield return new WaitForSeconds(0.2f);
 
         if (!Checkpoint.CurrentCheckpoint)
@@ -540,17 +560,17 @@ public class Player : MonoBehaviour
         
         transform.position = Checkpoint.CurrentCheckpoint.transform.position;
         yield return new WaitForFixedUpdate();
-        isDead = false;
+        _isDead = false;
     }
     
     private void WallSlide()
     {
-        Vector2 currentVelocity = rb.velocity;
+        Vector2 currentVelocity = _rb.velocity;
         bool pushingWall = currentVelocity.x > 0 && isOnRightWall 
                            || currentVelocity.x < 0 && isOnLeftWall;
         float push = pushingWall ? 0 : currentVelocity.x;
 
-        rb.velocity = new Vector2(push, -slideSpeed);
+        _rb.velocity = new Vector2(push, -slideSpeed);
     }
     
     public void OnInteract(InputAction.CallbackContext ctx)
@@ -563,5 +583,46 @@ public class Player : MonoBehaviour
             default:
                 break;
         }
+    }
+
+    public void OnPause(InputAction.CallbackContext ctx)
+    {
+        switch(ctx.phase)
+        {
+            case InputActionPhase.Started: 
+                Pause();
+                break;
+            default:
+                break;
+        }
+    }
+
+    public void Resume()
+    {
+        pauseMenuObject.SetActive(false);
+        GetComponent<PlayerInput>().SwitchCurrentActionMap("Gameplay");
+        _isPaused = false;
+    }
+
+    private void Pause()
+    {
+        pauseMenuObject.SetActive(true);
+        GetComponent<PlayerInput>().SwitchCurrentActionMap("Menu");
+        _isPaused = true;
+        StartCoroutine(StartPause());
+    }
+
+    private IEnumerator StartPause()
+    {
+        var gravityScale = _rb.gravityScale;
+        var velocity = _rb.velocity;
+
+        _rb.gravityScale = 0;
+        _rb.velocity = Vector2.zero;
+
+        yield return new WaitUntil(() => _isPaused == false);
+
+        _rb.gravityScale = gravityScale;
+        _rb.velocity = velocity;
     }
 }

@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Menu;
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -19,7 +20,7 @@ enum ELevels
     Level_2
 }
 
-public class LevelMenu : MonoBehaviour
+public class LevelMenu : MonoBehaviour, IMenu
 {
     public GameObject startMenu; 
     
@@ -28,7 +29,8 @@ public class LevelMenu : MonoBehaviour
     
     [SerializeField]
     private TMP_Text[] items;
-    private EMenuItem currentItem;
+    private EMenuItem currentItem = EMenuItem.LevelSelection;
+    private ELevels currentLevel = ELevels.Tutorial;
 
     [Header("Components")]
     public GameObject student;
@@ -60,29 +62,29 @@ public class LevelMenu : MonoBehaviour
     
     public void OnLeft(InputAction.CallbackContext ctx)
     {
+        if (currentItem != EMenuItem.LevelSelection || currentLevel == ELevels.Tutorial)
+        {
+            return;
+        }
+
+        currentLevel--;
+        items[(int) currentItem].text = currentLevel.ToString().Replace("_", " ");
     }
     
     public void OnRight(InputAction.CallbackContext ctx)
     {
+        if (currentItem != EMenuItem.LevelSelection || currentLevel == ELevels.Level_2)
+        {
+            return;
+        }
+
+        currentLevel++;
+        items[(int) currentItem].text = currentLevel.ToString().Replace("_", " ");
     }
 
     
     public void OnSelect(InputAction.CallbackContext ctx)
     {
-        Debug.Log(ctx);
-        if (ctx.phase == InputActionPhase.Performed)
-        {
-            return;
-        }
-        
-        if (ctx.phase == InputActionPhase.Canceled && currentItem == EMenuItem.Back)
-        {
-            startMenu.GetComponent<PlayerInput>().enabled = true;
-            return;
-        }
-        
-        Debug.Log(ctx);
-        
         switch (currentItem)
         {
             case EMenuItem.LevelSelection:
@@ -90,8 +92,8 @@ public class LevelMenu : MonoBehaviour
                 break;
             case EMenuItem.Back:
                 gameObject.SetActive(false);
-                gameObject.GetComponent<PlayerInput>().enabled = false;
                 startMenu.SetActive(true);
+                MenuManager.ActiveMenu = startMenu.GetComponent<MainMenu>();
                 break;
         }
     }
@@ -101,7 +103,24 @@ public class LevelMenu : MonoBehaviour
         student.GetComponent<Player>().Jump();
         yield return new WaitForSeconds(0.55f);
 
-        SceneManager.LoadScene("Game");
+        switch (currentLevel)
+        {
+            case ELevels.Tutorial:
+                SceneManager.LoadScene("Tutorial");
+                break;
+            case ELevels.Level_1:
+                SceneManager.LoadScene("Game");
+                break;
+            case ELevels.Level_2:
+                SceneManager.LoadScene("Level");
+                break;
+        }
+    }
 
+    public void OnEscape(InputAction.CallbackContext ctx)
+    {
+        gameObject.SetActive(false);
+        startMenu.SetActive(true);
+        MenuManager.ActiveMenu = startMenu.GetComponent<MainMenu>();
     }
 }

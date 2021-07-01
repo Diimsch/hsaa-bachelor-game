@@ -253,6 +253,34 @@ MonoBehaviour:
       m_Calls: []
     m_ActionId: 52cd7836-95ea-4235-b988-50b6ec398b84
     m_ActionName: Menu/Select[/Keyboard/enter,/Keyboard/space]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 91230d8e-19bb-465f-9841-622aaaa43c79
+    m_ActionName: Menu/Left[/Keyboard/leftArrow,/Keyboard/a]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 5333d96f-de0c-46d7-888d-1eacfc4972c1
+    m_ActionName: Menu/Right[/Keyboard/rightArrow,/Keyboard/d]
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 5009460185297843349}
+        m_TargetAssemblyTypeName: Player, Assembly-CSharp
+        m_MethodName: OnPause
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: a7a34c62-bb7c-4257-846d-f814533d0174
+    m_ActionName: Gameplay/New action
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: c422bd69-3c82-4873-ab51-dfd2b65a8810
+    m_ActionName: Menu/New action
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: 
   m_DefaultActionMap: Gameplay

@@ -21,14 +21,14 @@ public class Sign : MonoBehaviour
     public Sprite activatableSprite;
     public Sprite activatedSprite;
 
-    private Dialog dialog;
-    private bool interacting;
+    private Dialog _dialog;
+    private bool _interacting;
 
     public string signText;
     // Start is called before the first frame update
     void Start()
     {
-        dialog = dialogCanvas.GetComponent<Dialog>();
+        _dialog = dialogCanvas.GetComponent<Dialog>();
         sr = GetComponent<SpriteRenderer>();
     }
 
@@ -41,29 +41,29 @@ public class Sign : MonoBehaviour
 
     private void OnTriggerExit2D(Collider2D other)
     {
-        interacting = false;
+        _interacting = false;
         canvas.enabled = false;
         sr.sprite = normalSprite;
         text.color = normalTextColor;
-        dialog.Clear();
+        _dialog.Clear();
         SignManager.currentSign = null;
     }
 
     public void Interact()
     {
-        if (interacting)
+        if (_interacting)
         {
             sr.sprite = activatableSprite;
             text.color = normalTextColor;
-            dialog.Clear();
-            interacting = false;
+            _dialog.Clear();
+            _interacting = false;
         }
         else
         {
             sr.sprite = activatedSprite;
             text.color = activeTextColor;
-            interacting = true;
-            dialog.PushText(signText);
+            _interacting = true;
+            _dialog.PushText(signText);
         }
     }
 }

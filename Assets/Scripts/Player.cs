@@ -550,8 +550,17 @@ public class Player : MonoBehaviour
     private IEnumerator Die()
     {
         _isDead = true;
-        yield return new WaitForSeconds(3);
-        SceneManager.LoadScene("Game");
+        yield return new WaitForSeconds(0.2f);
+
+        if (!Checkpoint.CurrentCheckpoint)
+        {
+            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+            yield break;
+        }
+        
+        transform.position = Checkpoint.CurrentCheckpoint.transform.position;
+        yield return new WaitForFixedUpdate();
+        _isDead = false;
     }
     
     private void WallSlide()

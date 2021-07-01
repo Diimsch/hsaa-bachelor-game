@@ -3,6 +3,7 @@ using UnityEngine;
 
 public class Checkpoint : MonoBehaviour
 {
+    public GameObject coinPrefab;
     public static Checkpoint CurrentCheckpoint;
     
     private SpriteRenderer sr;
@@ -30,6 +31,14 @@ public class Checkpoint : MonoBehaviour
         canvas.enabled = true;
         text.color = activeTextColor;
         sr.sprite = activatedSprite;
+
+        for (int i = -2; i < 3; ++i)
+        {
+            GameObject coin = Instantiate(coinPrefab, transform.position, transform.rotation);
+            Rigidbody2D coinRb = coin.GetComponent<Rigidbody2D>();
+            coinRb.AddForce(new Vector2(i / 2.0f, 12.0f), ForceMode2D.Impulse);
+        }
+        
         
         // set current checkpoint
         CurrentCheckpoint = this;

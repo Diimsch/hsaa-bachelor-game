@@ -97,6 +97,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9564ea69ff0514f40bc6256a19d4b910, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  coinPrefab: {fileID: 42069107159568041, guid: 342c652e45fc83d4da199ddb697a246f, type: 3}
   text: {fileID: 7471033776199409743}
   activeTextColor: {r: 1, g: 0.6117647, b: 0.023529414, a: 1}
   activatedSprite: {fileID: -6276429844018924380, guid: 94fa057d1dbc5a9439c068559940fa4c, type: 3}

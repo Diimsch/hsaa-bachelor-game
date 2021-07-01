@@ -8,6 +8,7 @@ using Vector3 = UnityEngine.Vector3;
 
 public class Player : MonoBehaviour
 {
+    public int cp;
     [Header("Player Input")]
     [SerializeField]
     private Vector2 dir;
@@ -532,6 +533,7 @@ public class Player : MonoBehaviour
     {
         if (other.gameObject.CompareTag("Coin"))
         {
+            cp++;
             Destroy(other.gameObject);
         }
 

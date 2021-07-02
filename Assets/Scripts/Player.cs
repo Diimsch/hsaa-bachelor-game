@@ -561,7 +561,7 @@ public class Player : MonoBehaviour
         _rb.velocity = Vector2.zero;
         dust.Play();
         SoundManagerScript.PlaySound("Dash");
-        CameraShake.Instance.ShakeCamera(2f, 0.2f);
+        CameraShake.Instance.ShakeCamera(5f, 0.2f);
 
 
         float disableGravityForSecs = 0.05f;

@@ -562,6 +562,7 @@ public class Player : MonoBehaviour
         dust.Play();
         SoundManagerScript.PlaySound("Dash");
         CameraShake.Instance.ShakeCamera(2f, 0.2f);
+        FindObjectOfType<GhostTrail>().ShowGhost();
 
 
         float disableGravityForSecs = 0.05f;

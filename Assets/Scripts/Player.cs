@@ -525,7 +525,6 @@ public class Player : MonoBehaviour
     
     private IEnumerator FlashCharacter(Color color, int flashAmountInOneSecond)
     {
-        Debug.Log(flashAmountInOneSecond);
         float endTime = Time.fixedTime + 1;
         while (endTime > Time.fixedTime)
         {

@@ -14,6 +14,7 @@ public class GhostTrail : MonoBehaviour
     public float ghostInterval;
     public float fadeTime;
 
+
     private void Start()
     {
         player = FindObjectOfType<Player>();
@@ -27,17 +28,12 @@ public class GhostTrail : MonoBehaviour
         for (int i = 0; i < ghostsParent.childCount; i++)
         {
             Transform currentGhost = ghostsParent.GetChild(i);
-            Debug.Log("moiun0");
             s.AppendCallback(() => currentGhost.position = player.transform.position);
-            Debug.Log("moin1");
-            s.AppendCallback(() => currentGhost.GetComponent<SpriteRenderer>().sprite = player.spriteRenderer.sprite);
-            Debug.Log("moin2");
+            s.AppendCallback(() => currentGhost.GetComponent<SpriteRenderer>().flipX = player.spriteRenderer.flipX);
+            s.AppendCallback(() => currentGhost.GetComponent<SpriteRenderer>().sprite = player.spriteHolder.GetComponent<SpriteRenderer>().sprite);
             s.Append(currentGhost.GetComponent<SpriteRenderer>().material.DOColor(trailColor, 0));
-            Debug.Log("moin3");
             s.AppendCallback(() => FadeSprite(currentGhost));
-            Debug.Log("moin4");
             s.AppendInterval(ghostInterval);
-            Debug.Log("moin5");
         }
     }
 

@@ -10,6 +10,7 @@ TagManager:
   - PlatformBottom
   - PlatformTop
   - Checkpoint
+  - SpriteHolder
   layers:
   - Default
   - TransparentFX

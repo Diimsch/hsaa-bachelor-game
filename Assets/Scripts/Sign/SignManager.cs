@@ -8,6 +8,10 @@ public class SignManager : MonoBehaviour
 
     public static void InteractWithCurrentSign()
     {
+        if (!currentSign)
+        {
+            return;
+        }
         currentSign.Interact();
     }
 }

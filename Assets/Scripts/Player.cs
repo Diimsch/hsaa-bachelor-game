@@ -560,13 +560,8 @@ public class Player : MonoBehaviour
         _rb.velocity = Vector2.zero;
         dust.Play();
         SoundManagerScript.PlaySound("Dash");
-<<<<<<< HEAD
         CameraShake.Instance.ShakeCamera(2f, 0.2f);
         FindObjectOfType<GhostTrail>().ShowGhost();
-=======
-        CameraShake.Instance.ShakeCamera(5f, 0.2f);
->>>>>>> e818e07d7f644f915a41843a4f9795e88c027e92
-
 
         float disableGravityForSecs = 0.05f;
         if (dir.Equals(Vector2.zero) || dir.Equals(Vector2.left) || dir.Equals(Vector2.right))

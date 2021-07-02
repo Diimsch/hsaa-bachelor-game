@@ -525,7 +525,6 @@ public class Player : MonoBehaviour
     
     private IEnumerator FlashCharacter(Color color, int flashAmountInOneSecond)
     {
-        Debug.Log(flashAmountInOneSecond);
         float endTime = Time.fixedTime + 1;
         while (endTime > Time.fixedTime)
         {
@@ -561,8 +560,12 @@ public class Player : MonoBehaviour
         _rb.velocity = Vector2.zero;
         dust.Play();
         SoundManagerScript.PlaySound("Dash");
+<<<<<<< HEAD
         CameraShake.Instance.ShakeCamera(2f, 0.2f);
         FindObjectOfType<GhostTrail>().ShowGhost();
+=======
+        CameraShake.Instance.ShakeCamera(5f, 0.2f);
+>>>>>>> e818e07d7f644f915a41843a4f9795e88c027e92
 
 
         float disableGravityForSecs = 0.05f;

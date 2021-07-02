@@ -7,7 +7,6 @@ using DG.Tweening;
 public class GhostTrail : MonoBehaviour
 {
     private Player player;
-    private SpriteRenderer sr;
     public Transform ghostsParent;
     public Color trailColor;
     public Color fadeColor;
@@ -18,7 +17,6 @@ public class GhostTrail : MonoBehaviour
     private void Start()
     {
         player = FindObjectOfType<Player>();
-        sr = GetComponent<SpriteRenderer>();
     }
 
     public void ShowGhost()
@@ -28,18 +26,19 @@ public class GhostTrail : MonoBehaviour
         for (int i = 0; i < ghostsParent.childCount; i++)
         {
             Transform currentGhost = ghostsParent.GetChild(i);
+            SpriteRenderer ghostSpriteRenderer = currentGhost.GetComponent<SpriteRenderer>();
             s.AppendCallback(() => currentGhost.position = player.transform.position);
-            s.AppendCallback(() => currentGhost.GetComponent<SpriteRenderer>().flipX = player.spriteRenderer.flipX);
-            s.AppendCallback(() => currentGhost.GetComponent<SpriteRenderer>().sprite = player.spriteHolder.GetComponent<SpriteRenderer>().sprite);
-            s.Append(currentGhost.GetComponent<SpriteRenderer>().material.DOColor(trailColor, 0));
-            s.AppendCallback(() => FadeSprite(currentGhost));
+            s.AppendCallback(() => ghostSpriteRenderer.flipX = player.spriteRenderer.flipX);
+            s.AppendCallback(() => ghostSpriteRenderer.sprite = player.spriteRenderer.sprite);
+            s.Append(ghostSpriteRenderer.material.DOColor(trailColor, 0));
+            s.AppendCallback(() => FadeSprite(ghostSpriteRenderer));
             s.AppendInterval(ghostInterval);
         }
     }
 
-    public void FadeSprite(Transform current)
+    private void FadeSprite(SpriteRenderer ghostSpriteRenderer)
     {
-        current.GetComponent<SpriteRenderer>().material.DOKill();
-        current.GetComponent<SpriteRenderer>().material.DOColor(fadeColor, fadeTime);
+        ghostSpriteRenderer.material.DOKill();
+        ghostSpriteRenderer.material.DOColor(fadeColor, fadeTime);
     }
 }

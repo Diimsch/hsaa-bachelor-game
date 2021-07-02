@@ -297,6 +297,8 @@ public class Player : MonoBehaviour
     {
         Vector2 jumpDirection = Vector2.up;
         // walljump
+        SoundManagerScript.PlaySound("Jump");
+
 
         bool changeDirection = false;
         if (isOnWall && !isGrounded)
@@ -507,6 +509,8 @@ public class Player : MonoBehaviour
         
         _rb.velocity = Vector2.zero;
         dust.Play();
+        SoundManagerScript.PlaySound("Dash");
+
 
         float disableGravityForSecs = 0.05f;
         if (dir.Equals(Vector2.zero) || dir.Equals(Vector2.left) || dir.Equals(Vector2.right))
@@ -535,11 +539,13 @@ public class Player : MonoBehaviour
         {
             cp++;
             Destroy(other.gameObject);
+            SoundManagerScript.PlaySound("CoinPickup");
         }
 
         if (other.gameObject.CompareTag("Death"))
         {
             StartCoroutine(Die());
+            SoundManagerScript.PlaySound("Death");
         }
 
         if (other.gameObject.CompareTag("Orb"))

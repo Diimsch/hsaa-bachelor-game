@@ -9,6 +9,7 @@ TagManager:
   - Orb
   - PlatformBottom
   - PlatformTop
+  - Checkpoint
   layers:
   - Default
   - TransparentFX

@@ -27,6 +27,7 @@ public class Checkpoint : MonoBehaviour
     private void OnTriggerEnter2D(Collider2D other)
     {
         if (triggered) return;
+        SoundManagerScript.PlaySound("Checkpoint");
         triggered = true;
         canvas.enabled = true;
         text.color = activeTextColor;

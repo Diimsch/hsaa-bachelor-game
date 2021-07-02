@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Numerics;
 using UnityEngine;
@@ -14,6 +15,7 @@ public class Player : MonoBehaviour
     private Vector2 dir;
     private IEnumerator _grabbing = null;
     private int _stamina = 100;
+    private IEnumerator _flashing = null;
 
     [Header("Movement")]
     public float runSpeed = 10.0f;
@@ -140,10 +142,16 @@ public class Player : MonoBehaviour
             _lastValidGroundTouch = Time.time + groundTouchedValidTil;
             wallSlide = false;
         }
-        
+
         if(isGrounded && _grabbing == null)
         {
             _stamina = 100;
+            spriteRenderer.color = Color.white;
+        }
+        
+        if (_stamina == 0)
+        {
+            spriteRenderer.color = Color.red;
         }
 
         if (isOnWall && _grabbing == null && !isGrounded && _rb.velocity.y <= 0)
@@ -479,10 +487,53 @@ public class Player : MonoBehaviour
     {
         while (_stamina > 0)
         {
-            _stamina -= 0;
+            IEnumerator flashing = null;
+            _stamina -= 2;
+            if (_stamina == 50)
+            {
+                flashing = FlashCharacter(Color.red, 2);
+            }
+            else if (_stamina == 30)
+            {
+                flashing = FlashCharacter(Color.red, 4);
+            }
+            else if (_stamina == 10)
+            {
+                flashing = FlashCharacter(Color.red, 6);
+            }
+
+            if (flashing != null)
+            {
+                if (_flashing != null)
+                {
+                    StopCoroutine(_flashing);
+                }
+                _flashing = flashing;
+                StartCoroutine(_flashing);
+            }
+            
             yield return new WaitForSeconds(0.1f);
         }
+
+        if (_flashing == null)
+        {
+            StopCoroutine(_flashing);
+            _flashing = null;
+        }
         _grabbing = null;
+    }
+    
+    private IEnumerator FlashCharacter(Color color, int flashAmountInOneSecond)
+    {
+        Debug.Log(flashAmountInOneSecond);
+        float endTime = Time.fixedTime + 1;
+        while (endTime > Time.fixedTime)
+        {
+            spriteRenderer.color = color;
+            yield return new WaitForSeconds(1.0f / flashAmountInOneSecond / 2);
+            spriteRenderer.color = Color.white;
+            yield return new WaitForSeconds(1.0f / flashAmountInOneSecond / 2);
+        }
     }
 
     public void OnDash(InputAction.CallbackContext ctx)

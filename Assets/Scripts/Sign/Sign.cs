@@ -41,6 +41,10 @@ public class Sign : MonoBehaviour
 
     private void OnTriggerExit2D(Collider2D other)
     {
+        if (_interacting)
+        {
+            SoundManagerScript.StopSound();
+        }
         _interacting = false;
         canvas.enabled = false;
         sr.sprite = normalSprite;
@@ -51,15 +55,18 @@ public class Sign : MonoBehaviour
 
     public void Interact()
     {
+
         if (_interacting)
         {
             sr.sprite = activatableSprite;
             text.color = normalTextColor;
             _dialog.Clear();
             _interacting = false;
+            SoundManagerScript.StopSound();
         }
         else
         {
+            SoundManagerScript.PlaySound("Sign");
             sr.sprite = activatedSprite;
             text.color = activeTextColor;
             _interacting = true;

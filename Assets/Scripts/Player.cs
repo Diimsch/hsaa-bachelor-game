@@ -550,6 +550,7 @@ public class Player : MonoBehaviour
 
         if (other.gameObject.CompareTag("Orb"))
         {
+            SoundManagerScript.PlaySound("DashOrb");
             Destroy(other.gameObject);
             hasDashed = false;
         }

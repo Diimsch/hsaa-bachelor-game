@@ -5,7 +5,7 @@ using UnityEngine;
 public class SoundManagerScript : MonoBehaviour
 {
 
-    public static AudioClip coinPickupSound, checkPointSound, dashSound, deathSound, jumpSound;
+    public static AudioClip coinPickupSound, checkPointSound, dashSound, deathSound, jumpSound, signSound, dashOrbSound;
     static AudioSource audioSrc;
 
     // Start is called before the first frame update
@@ -16,6 +16,8 @@ public class SoundManagerScript : MonoBehaviour
         dashSound = Resources.Load<AudioClip>("Dash");
         deathSound = Resources.Load<AudioClip>("Death");
         jumpSound = Resources.Load<AudioClip>("Jump");
+        signSound = Resources.Load<AudioClip>("Sign");
+        dashOrbSound = Resources.Load<AudioClip>("DashOrb");
 
 
         audioSrc = GetComponent<AudioSource>();
@@ -46,6 +48,17 @@ public class SoundManagerScript : MonoBehaviour
             case "Jump":
                 audioSrc.PlayOneShot(jumpSound);
                 break;
+            case "Sign":
+                audioSrc.PlayOneShot(signSound);
+                break;
+            case "DashOrb":
+                audioSrc.PlayOneShot(dashOrbSound);
+                break;
         }
+    }
+
+    public static void StopSound()
+    {
+        audioSrc.Stop();
     }
 }

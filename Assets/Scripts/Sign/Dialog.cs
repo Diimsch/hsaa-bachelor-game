@@ -54,7 +54,6 @@ public class Dialog : MonoBehaviour
 
             yield return null;
         }
-
-        yield return null;
+        SoundManagerScript.StopSound();
     }
 }

@@ -623,6 +623,7 @@ public class Player : MonoBehaviour
             SoundManagerScript.PlaySound("DashOrb");
             Destroy(other.gameObject);
             hasDashed = false;
+            _stamina = 100;
         }
     }
 

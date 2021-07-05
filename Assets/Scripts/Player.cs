@@ -307,6 +307,12 @@ public class Player : MonoBehaviour
         // walljump
         SoundManagerScript.PlaySound("Jump");
 
+        // drain stamina when jumping on wall
+        if (_grabbing != null && _stamina > 0)
+        {
+            _stamina -= _stamina > 25 ? 25 : 0;
+        }
+
 
         bool changeDirection = false;
         if (isOnWall && !isGrounded)
@@ -485,20 +491,33 @@ public class Player : MonoBehaviour
 
     private IEnumerator Grab()
     {
+        int stage = 0;
         while (_stamina > 0)
         {
             IEnumerator flashing = null;
-            _stamina -= 2;
-            if (_stamina == 50)
+
+            //base stamina removal
+            _stamina -= 1;
+            
+            // moving on the wall, drain more stamina
+            if (Mathf.Abs(_rb.velocity.y) > 0.1f)
             {
+                _stamina -= 1;
+            }
+            
+            if (stage == 0 && _stamina <= 50)
+            {
+                stage = 1;
                 flashing = FlashCharacter(Color.red, 2);
             }
-            else if (_stamina == 30)
+            else if (stage == 1 && _stamina <= 30)
             {
+                stage = 2;
                 flashing = FlashCharacter(Color.red, 4);
             }
-            else if (_stamina == 10)
+            else if (stage == 2 && _stamina <= 10)
             {
+                stage = 3;
                 flashing = FlashCharacter(Color.red, 6);
             }
 
@@ -563,13 +582,13 @@ public class Player : MonoBehaviour
         CameraShake.Instance.ShakeCamera(2f, 0.2f);
         FindObjectOfType<GhostTrail>().ShowGhost();
 
-        float disableGravityForSecs = 0.05f;
+        float disableGravityForSecs = 0.075f;
         if (dir.Equals(Vector2.zero) || dir.Equals(Vector2.left) || dir.Equals(Vector2.right))
         {
             Vector2 dashingDirection = spriteRenderer.flipX ? Vector2.left : Vector2.right;
             dashingDirection += new Vector2(0, 0.1f);
             _rb.velocity += dashingDirection * dashSpeed;
-            disableGravityForSecs *= 2;
+            disableGravityForSecs *= 1.5f;
         }
         else
         {

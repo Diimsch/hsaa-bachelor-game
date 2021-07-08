@@ -184,6 +184,9 @@ public class Player : MonoBehaviour
         UpdatePhysics(currentDirection);
     }
 
+    /**
+     * Tinkers with the physics of our character depending on the current player state
+     */
     private void UpdatePhysics(Vector2 input)
     {
         if ((isBangingHeadLeft || isBangingHeadRight) && !isBangingHeadBoth)
@@ -239,6 +242,9 @@ public class Player : MonoBehaviour
         }
     }
 
+    /**
+     * Move character in X&Y direction
+     */
     private void MoveCharacter(Vector2 input)
     {
         //climbing up.
@@ -265,6 +271,7 @@ public class Player : MonoBehaviour
             }
         }
 
+        // stop climbing the ledge if user input steers in other direction
         if (_climbingLedge != null && Mathf.Abs(input.x) > 0f)
         {
             StopCoroutine(_climbingLedge);
@@ -278,30 +285,38 @@ public class Player : MonoBehaviour
         }
     }
 
+    /**
+     * Coroutine that makes our player climb the ledge
+     * Gets executed when in the climbing process, our players head doesn't touch the wall anymore.
+     * This is the indicator that we have to climb the ledge.
+     */
     private IEnumerator ClimbLedge()
     {
+        // boost character up till our feet aren't touching the wall anymore
         while (feetTouchingWall)
         {
             _rb.AddForce(Vector2.up, ForceMode2D.Impulse);
             yield return new WaitForFixedUpdate();
-            Debug.Log("pushing up.");
         }
-     
+        
         spriteRenderer.flipX = !spriteRenderer.flipX;
         //_rb.velocity = Vector2.zero;
+        
+        // disable collider and move our character over the ledge
         _bc.enabled = false;
-
         Vector2 ledgePosition = isOnLeftWall ? Vector2.left : Vector2.right;
         while (!isGroundedLeft || !isGroundedRight)
         {
-            Debug.Log("pushing dir");
             Vector2 velocity = ledgePosition * (runSpeed * Time.deltaTime);
             _rb.velocity += velocity;
             yield return new WaitForFixedUpdate();
         }
 
+        //stop velocity once we touch the ground after successfully climbing the ledge
         _rb.velocity = Vector2.zero;
         _bc.enabled = true;
+        
+        // we aren't holding on to anything, stop the coroutine.
         if (_grabbing != null)
         {
             StopCoroutine(_grabbing);
@@ -311,6 +326,13 @@ public class Player : MonoBehaviour
         _climbingLedge = null;
     }
     
+    /**
+     * Makes the player jump by...
+     * adding force to rigidbody
+     * trigger animator isJumping value
+     * drain stamina when on wall
+     * play graphic/sound effects
+     */
     public void Jump()
     {
         Vector2 jumpDirection = Vector2.up;
@@ -343,7 +365,10 @@ public class Player : MonoBehaviour
             UpdateDirection(jumpDirection);
         }
     }
-
+    
+    /**
+     * Updates the facing direction of the player according to the user input
+     */
     private void UpdateDirection(Vector2 input, bool ignoreWall = false)
     {
         if((_grabbing != null || wallSlide) && !ignoreWall)
@@ -371,6 +396,9 @@ public class Player : MonoBehaviour
         }
     }
 
+    /**
+     * Updates animator values dependant on player state
+     */
     private void UpdateAnimator(Vector2 input)
     {
         animator.SetBool(IsRunning, Mathf.Abs(_rb.velocity.x) > 0.1f);
@@ -380,6 +408,9 @@ public class Player : MonoBehaviour
         animator.SetBool(IsClimbing, _grabbing != null && (isOnWall || feetTouchingWall) && Mathf.Abs(_rb.velocity.y) > 0.1f);
     }
 
+    /**
+     * Draws out Gizmos of our RayCasts in Editor/Game
+     */
     private void OnDrawGizmos()
     {
         var pos = transform.position;
@@ -403,6 +434,10 @@ public class Player : MonoBehaviour
         Gizmos.DrawLine(pos - cornerCorrectionOffsetLeft, pos - cornerCorrectionOffsetLeft + Vector3.up * cornerCorrectionLength);
     }
 
+    /**
+     * Adds a squeeze effect to the character sprites.
+     * Used at jump start and landing
+     */
     IEnumerator SqueezeSprites(Vector2 squeeze, float animTime)
     {
         Vector3 squeezedScale = squeeze;
@@ -425,6 +460,9 @@ public class Player : MonoBehaviour
         }
     }
     
+    /**
+     * Unity Input system Event Handler for Move
+     */
     public void OnMove(InputAction.CallbackContext ctx)
     {
         if (_isDead)
@@ -434,6 +472,9 @@ public class Player : MonoBehaviour
         dir = ctx.ReadValue<Vector2>();
     }
 
+    /**
+     * Unity Input system Event Handler for Jumping
+     */
     public void OnJump(InputAction.CallbackContext ctx)
     {
         if (_isDead)
@@ -455,6 +496,9 @@ public class Player : MonoBehaviour
         }
     }
 
+    /**
+     * Unity Input system Event Handler for Grabbing
+     */
     public void OnGrab(InputAction.CallbackContext ctx)
     {
         if (_isDead)
@@ -499,6 +543,9 @@ public class Player : MonoBehaviour
         }
     }
 
+    /**
+     * Unity Input system Event Handler for Grabbing/Climbing
+     */
     private IEnumerator Grab()
     {
         int stage = 0;
@@ -552,6 +599,9 @@ public class Player : MonoBehaviour
         _grabbing = null;
     }
     
+    /**
+     * Flashes the character by changing the color used by our Shader Graph (Universal Render Pipeline)
+     */
     private IEnumerator FlashCharacter(Color color, int flashAmountInOneSecond)
     {
         float endTime = Time.fixedTime + 1;
@@ -564,6 +614,9 @@ public class Player : MonoBehaviour
         }
     }
 
+    /**
+     * Unity Input system Event Handler for Dash
+     */
     public void OnDash(InputAction.CallbackContext ctx)
     {
         if (_isDead)
@@ -576,11 +629,12 @@ public class Player : MonoBehaviour
             case InputActionPhase.Performed:
                 StartCoroutine(Dash());
                 break;
-            default:
-                break;
         }
     }
 
+    /**
+     * Coroutine executed when dashing
+     */
     private IEnumerator Dash()
     {
         if (hasDashed)
@@ -613,6 +667,10 @@ public class Player : MonoBehaviour
         _dashing = false;
     }
 
+    /**
+     * Handles entering the collider of other game objects
+     * CP, Death, Dash-Orbs, ...
+     */
     private void OnTriggerEnter2D(Collider2D other)
     {
         if (other.gameObject.CompareTag("Coin"))
@@ -637,6 +695,10 @@ public class Player : MonoBehaviour
         }
     }
 
+    /**
+     * Coroutine exected once the character dies, delays death for 200ms so it feels better
+     * Spawns player at latest checkpoint
+     */
     private IEnumerator Die()
     {
         _isDead = true;
@@ -653,6 +715,9 @@ public class Player : MonoBehaviour
         _isDead = false;
     }
     
+    /**
+     * Wall Sliding logic when character is on wall but not grabbing onto it or mana equal 0
+     */
     private void WallSlide()
     {
         Vector2 currentVelocity = _rb.velocity;
@@ -663,6 +728,9 @@ public class Player : MonoBehaviour
         _rb.velocity = new Vector2(push, -slideSpeed);
     }
     
+    /**
+     * Unity Input system Event Handler for Interactions
+     */
     public void OnInteract(InputAction.CallbackContext ctx)
     {
         switch (ctx.phase)
@@ -675,6 +743,9 @@ public class Player : MonoBehaviour
         }
     }
 
+    /**
+     * Unity Input system Event Handler for ESC/pause
+     */
     public void OnPause(InputAction.CallbackContext ctx)
     {
         switch(ctx.phase)
@@ -687,6 +758,9 @@ public class Player : MonoBehaviour
         }
     }
 
+    /**
+     * Disables pause menu and switches to gameplay action map
+     */
     public void Resume()
     {
         pauseMenuObject.SetActive(false);
@@ -694,6 +768,9 @@ public class Player : MonoBehaviour
         _isPaused = false;
     }
 
+    /**
+     * Enables pause menu and switches to menu action map
+     */
     private void Pause()
     {
         pauseMenuObject.SetActive(true);
@@ -702,6 +779,9 @@ public class Player : MonoBehaviour
         StartCoroutine(StartPause());
     }
 
+    /**
+     * Pause Coroutine saves important rigidbody info for the duration of the pause
+     */
     private IEnumerator StartPause()
     {
         var gravityScale = _rb.gravityScale;

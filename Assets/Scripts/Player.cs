@@ -264,7 +264,6 @@ public class Player : MonoBehaviour
                 {
                     return;
                 }
-
                 _climbingLedge = ClimbLedge();
                 StartCoroutine(_climbingLedge);
                 return;
@@ -304,10 +303,11 @@ public class Player : MonoBehaviour
         
         // disable collider and move our character over the ledge
         _bc.enabled = false;
-        Vector2 ledgePosition = isOnLeftWall ? Vector2.left : Vector2.right;
+        
         while (!isGroundedLeft || !isGroundedRight)
         {
-            Vector2 velocity = ledgePosition * (runSpeed * Time.deltaTime);
+            Vector2 velocity = spriteRenderer.flipX ? Vector2.left : Vector2.right;
+            velocity *= runSpeed * Time.deltaTime;
             _rb.velocity += velocity;
             yield return new WaitForFixedUpdate();
         }

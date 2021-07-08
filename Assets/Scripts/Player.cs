@@ -264,6 +264,13 @@ public class Player : MonoBehaviour
                 return;
             }
         }
+
+        if (_climbingLedge != null && Mathf.Abs(input.x) > 0f)
+        {
+            StopCoroutine(_climbingLedge);
+            _climbingLedge = null;
+        }
+
         _rb.velocity += Vector2.right * (input.x * runSpeed * Time.deltaTime);
         if(Mathf.Abs(_rb.velocity.x) > maxSpeed && !_dashing)
         {
@@ -277,15 +284,18 @@ public class Player : MonoBehaviour
         {
             _rb.AddForce(Vector2.up, ForceMode2D.Impulse);
             yield return new WaitForFixedUpdate();
+            Debug.Log("pushing up.");
         }
      
         spriteRenderer.flipX = !spriteRenderer.flipX;
-        _rb.velocity = Vector2.zero;
+        //_rb.velocity = Vector2.zero;
         _bc.enabled = false;
+
+        Vector2 ledgePosition = isOnLeftWall ? Vector2.left : Vector2.right;
         while (!isGroundedLeft || !isGroundedRight)
         {
-            Vector2 velocity = spriteRenderer.flipX ? Vector2.left : Vector2.right;
-            velocity *= runSpeed * Time.deltaTime;
+            Debug.Log("pushing dir");
+            Vector2 velocity = ledgePosition * (runSpeed * Time.deltaTime);
             _rb.velocity += velocity;
             yield return new WaitForFixedUpdate();
         }

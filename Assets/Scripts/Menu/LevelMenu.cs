@@ -109,10 +109,10 @@ public class LevelMenu : MonoBehaviour, IMenu
                 SceneManager.LoadScene("Tutorial");
                 break;
             case ELevels.Level_1:
-                SceneManager.LoadScene("Game");
+                SceneManager.LoadScene("Level 1");
                 break;
             case ELevels.Level_2:
-                SceneManager.LoadScene("Level");
+                SceneManager.LoadScene("Level 2");
                 break;
         }
     }

@@ -3,15 +3,14 @@ on: [push, pull_request]
 jobs:
   build:
     name: Build for ${{ matrix.targetPlatform }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     strategy:
       fail-fast: false
       matrix:
         projectPath:
           - test-project
         unityVersion:
-          - 2019.4.1f1
-          - 2020.2.1f1
+          - 2020.3.3f1
         targetPlatform:
           - StandaloneOSX # Build a macOS standalone
           - StandaloneWindows64 # Build a Windows 64-bit standalone.
@@ -52,3 +51,8 @@ jobs:
         with:
           name: Build
           path: build
+      - uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        

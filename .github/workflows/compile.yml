@@ -44,11 +44,6 @@ jobs:
         with:
           name: Build
           path: build
-      - name: Release
-        uses: softprops/action-gh-release@v1
-        if: startsWith(github.ref, 'refs/tags/')
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   release:
     name: Create release
     runs-on: ubuntu-latest

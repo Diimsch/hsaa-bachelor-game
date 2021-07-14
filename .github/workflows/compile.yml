@@ -1,5 +1,8 @@
-name: Compile Action
-on: [push, pull_request, workflow_dispatch]
+name: Release
+on: 
+  push:
+    tags:
+    - '*'
 jobs:
   build:
     name: Build for ${{ matrix.targetPlatform }}

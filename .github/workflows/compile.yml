@@ -4,7 +4,7 @@ on: [push, pull_request]
 
 jobs:
   build:
-    name: Build my project ✨
+    name: Build for ${{ matrix.targetPlatform }}
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -24,7 +24,7 @@ jobs:
       - uses: actions/cache@v2
         with:
           path: Library
-          key: Library
+          key: Library-${{ matrix.targetPlatform }}
       # Test
       - name: Run tests
         uses: game-ci/unity-test-runner@v2

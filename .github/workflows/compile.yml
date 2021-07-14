@@ -1,6 +1,6 @@
 name: Compile Action
 
-on: [push, pull_request]
+on: [push, pull_request, workflow_dispatch]
 
 jobs:
   build:
@@ -46,3 +46,19 @@ jobs:
         with:
           name: Build
           path: build
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  release:
+    name: Create a release if this is a tagged commit
+    runs-on: ubuntu-latest
+    #if: startsWith(github.ref, 'refs/tags/')
+    steps:
+      - uses: actions/download-artifact@v2
+        with:
+          name: Build
+      - name: Display structure of downloaded files
+        run: ls -R
+
